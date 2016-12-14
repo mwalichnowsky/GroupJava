@@ -1,0 +1,6 @@
+Tasks
+Zach - GUI, Database
+Branden - Classes, Database, Event Handling
+Michael - Classes, Database, Event Handling
+Ross - Error Handling
+Matthew - GUI, Commenting and Formating 

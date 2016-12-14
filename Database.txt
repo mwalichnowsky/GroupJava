@@ -1,0 +1,4 @@
+Database Name: GroupJava
+User Name: GroupJava
+Password: h^dHd(j6^hmD#(mfjgSK;fkss
+Link: jdbc:mysql://http://72.139.8.122:82/phpmyadmin/"
