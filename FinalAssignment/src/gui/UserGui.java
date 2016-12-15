@@ -19,88 +19,87 @@ import javax.swing.table.DefaultTableModel;
 public class UserGui extends JFrame
 {
     /* ----------------------- Variables------------------------------------- */
-        // J Text Fields.
-        private JTextField 
+        final private JTextField 
                 
+            /* Create Employee Personal Info Fields */
+            textFirstName = new JTextField(15),
+            textLastName = new JTextField(15),
+            textGender = new JTextField(15),
+            textAge = new JTextField(2),
+            textAddress = new JTextField(15),
+            textDateOfBirth = new JTextField(15),
+            textPhoneNumber = new JTextField(15),
+            textSIN = new JTextField(15),
+        
             /* Create Employee Work Info Fields */
+            textDateHired = new JTextField(15),
+            textPosition = new JTextField(15),
+            textStatus = new JTextField(15),
+            textDepartment = new JTextField(15),
             textSalary = new JTextField(15),
             textHourlyRate = new JTextField(15),
             textCommissionRate = new JTextField(15),
-                
+
             /* Create Product Text Fields */
-            textProductName, textProductNumber, textManufacturer, 
-            textProductCode, textProductPrice,
+            textProductName = new JTextField(15), 
+            textProductCode = new JTextField(15), 
+            textProductPrice = new JTextField(15),
+            textProductCommission = new JTextField(15),
                            
             /* Create Manufacturer Text Fields */
-            textManufacturerName, textManufacturerLocation, 
-            textManufacturerPhoneNumber, textManufacturerSalesAssociate,
+            textManufacturerName = new JTextField(15),
+            textManufacturerLocation = new JTextField(15), 
+            textManufacturerPhoneNumber = new JTextField(15), 
+            textManufacturerSalesAssociate = new JTextField(15),
                 
             /* Search Text Field */
-            textSearchEmployees, textSearchInventory,
+            textSearchEmployees = new JTextField(15),
+            textSearchInventory = new JTextField(15),
                 
             /* Sales Field */
-            textQuantity, textSearchSales
+            textSalesQuantity = new JTextField(15), 
+            textSalesSearch = new JTextField(15)
         ;
         
-        // J Text Ares.
         private JTextArea
                 
             /* Search Text Field */
-            textSearchResults, textSearchInventoryResults, textProductSummary,
-            textManufacturerSummary
+            areaSearchResults = new JTextArea(), areaSearchInventory, 
+            areaProductSummary, areaManufacturerSummary
         ;
         
-        // J Panels.
         final private JPanel 
             headerPanel = new JPanel(), footerPanel = new JPanel(),
                 
             /* HR Panels */    
-            employeePersonalInformation = new JPanel(), 
-            employeeWorkInformation = new JPanel(), 
-            searchEmployeePanel = new JPanel(), 
-            inventorySearchSelectionPanel = new JPanel(),
-            employeeSelectionPanel = new JPanel(), 
-            searchEmployeeMasterPanel = new JPanel(), 
             createEmployeePanel = new JPanel(),
-                
+            searchEmployeePanel = new JPanel(), 
+            
             /* Inventory Panels */    
-            createProductPanel  = new JPanel(), inventoryPanel = new JPanel(),
-            createManufacturerPanel = new JPanel(), 
-            searchInventoryMasterPanel = new JPanel(),
+            inventoryPanel = new JPanel(),
             searchInventoryPanel = new JPanel(),
-            createProductMasterPanel = new JPanel(),
-            createManufacturerMasterPanel = new JPanel(),
-                
+            createProductPanel  = new JPanel(), 
+            createManufacturerPanel = new JPanel(), 
+            
             /* Sales Panels */
-            salesMasterPanel = new JPanel(), createSalesPanel = new JPanel(), 
-            searchSalesPanel = new JPanel()
+            createSalesPanel = new JPanel(), searchSalesPanel = new JPanel()
         ;               
         
-        // J Tables.
         final private JTable 
             employeeSearchTable = new JTable(),
             productSearchTable = new JTable(),
             manufacturerSearchTable = new JTable()
         ;
         
-        // J Buttons.
-        private JButton 
+        final private JButton 
             exitButton = new JButton("Exit"), 
-            submitButton = new JButton("Submit"), createButton, clearButton, 
-            editButton, deleteButton
+            submitButton = new JButton("Submit"), 
+            createButton = new JButton("Create"),
+            clearButton = new JButton("Clear"), 
+            editButton = new JButton("Edit"), 
+            deleteButton = new JButton("Delete")
         ;
         
-        // J Radio Buttons.
-        final private JRadioButton 
-            basePlusCommissionEmployee = new JRadioButton
-                                       ("Base Plus Commission Employee", false), 
-            commissionEmployee = new JRadioButton
-                                                  ("Comission Employee", false), 
-            hourlyEmployee = new JRadioButton("Hourly Employee", false), 
-            salaryEmployee = new JRadioButton("Salary Employee", true)
-        ;
-        
-        // JTabbed Interfaces.
         final private JTabbedPane 
             mainTabPane = new JTabbedPane(), // Main Tab.
             hrTabPane = new JTabbedPane(), // Human Resources Tab.
@@ -108,11 +107,20 @@ public class UserGui extends JFrame
             subInventoryTabPane = new JTabbedPane(), // Sub Inventory Tab.
             salesTabPane = new JTabbedPane() // Sales Tab.
         ;
+        
+        final private JRadioButton 
+            basePlusCommissionEmployee = new JRadioButton
+                                       ("Base Plus Commission Employee", false), 
+            commissionEmployee = new JRadioButton("Comission Employee", false), 
+            hourlyEmployee = new JRadioButton("Hourly Employee", false), 
+            salaryEmployee = new JRadioButton("Salary Employee", true)
+        ;
             
         Connection conn = null;
         Statement stat = null;
         ResultSet rs = null;
                 
+        // Set variable for calling our global methods.
         Global g = new Global();
         
     /////////////////////// End of Variables ///////////////////////////////////
@@ -124,9 +132,11 @@ public class UserGui extends JFrame
             super("Prestige Worldwide");
             setLayout(new BorderLayout());
             
+            textCommissionRate.setEditable(false);
+            textHourlyRate.setEditable(false);
+            
             // Build Panels.
             buildHeaderPanel("Welcome to Management Box!");
-            buildEmployeeSelectionPanel();
             buildCreateSalesPanel();
             buildCreateEmployeePanel();
             buildSearchEmployeePanel();
@@ -135,8 +145,6 @@ public class UserGui extends JFrame
             buildCreateManufacturerPanel();
             buildFooterPanel();
             
-            // Setup Panels.
-            setupPanels();
             
             // Setup Tabs.
             setupTabs();
@@ -147,10 +155,11 @@ public class UserGui extends JFrame
             add(footerPanel, BorderLayout.SOUTH);
             
             pack();
+            
+            
         }
     /////////////////////// End of Constructor /////////////////////////////////
         
-    
     /* ----------------------- Build Panels --------------------------------- */ 
         /**
          * This creates a greetings panel.
@@ -169,8 +178,10 @@ public class UserGui extends JFrame
          * This creates the employee selection panel.
          * @param labelMessage 
          */
-        private void buildEmployeeSelectionPanel()
+        private JPanel buildEmployeeSelectionPanel()
         {
+            JPanel employeeSelectionPanel = new JPanel();
+        
             // Add the buttons to the selection group.
             ButtonGroup employeeSelectionGroup = new ButtonGroup();
             employeeSelectionGroup.add(hourlyEmployee);
@@ -188,11 +199,13 @@ public class UserGui extends JFrame
             employeeSelectionPanel.add(salaryEmployee);
 
             // RadioButton action listeners.
-            RadioButtonHandler rbHandler = new RadioButtonHandler();
+            EmpRadioButtonHandler rbHandler = new EmpRadioButtonHandler();
             salaryEmployee.addItemListener(rbHandler);
             commissionEmployee.addItemListener(rbHandler);
             hourlyEmployee.addItemListener(rbHandler);
             basePlusCommissionEmployee.addItemListener(rbHandler);
+            
+            return employeeSelectionPanel;
         }
 
 
@@ -202,22 +215,8 @@ public class UserGui extends JFrame
         private void buildCreateEmployeePanel()
         {
             /* ----------- Employee Information Section --------------------- */
-
+                JPanel employeePersonalInformation = new JPanel(); 
                 employeePersonalInformation.setLayout(new GridLayout(4,2));
-
-                // Create text boxes.
-                JTextField
-                    textFirstName = new JTextField(15),
-                    textLastName = new JTextField(15),
-                    textGender = new JTextField(15),
-                    textAge = new JTextField(2),
-                    textAddress = new JTextField(15),
-                    textDateOfBirth = new JTextField(15),
-                    textPhoneNumber = new JTextField(15),
-                    textSIN = new JTextField(15)
-                ;
-                
-                // Add Labels and Text to the panel.
                 g.border(employeePersonalInformation, "Personal Information");
                 employeePersonalInformation.add(new JLabel("First Name:"));
                 employeePersonalInformation.add(textFirstName);
@@ -238,17 +237,8 @@ public class UserGui extends JFrame
             ////////////// End of Main Panel Top ///////////////////////////////
 
             /* ----------- Main Panel Bottom -------------------------------- */
+                JPanel employeeWorkInformation = new JPanel();    
                 employeeWorkInformation.setLayout(new GridLayout(4,2));
-
-                // Create text boxes.
-                JTextField
-                    textDateHired = new JTextField(15),
-                    textPosition = new JTextField(15),
-                    textStatus = new JTextField(15),
-                    textDepartment = new JTextField(15)
-                ;
-
-                // Add Labels and Text to the panel.
                 g.border(employeeWorkInformation, "Work Information");
                 employeeWorkInformation.add(new JLabel("Date Hired:"));
                 employeeWorkInformation.add(textDateHired);
@@ -264,8 +254,16 @@ public class UserGui extends JFrame
                 employeeWorkInformation.add(textSalary);
                 employeeWorkInformation.add(new JLabel("Department:"));
                 employeeWorkInformation.add(textDepartment);
-
             ////////////// End of Main Panel Bottom ////////////////////////////
+            
+            JPanel employeeSelectionPanel = buildEmployeeSelectionPanel(); 
+            
+            createEmployeePanel.setLayout(new BorderLayout());
+            createEmployeePanel.add(employeeSelectionPanel, BorderLayout.NORTH);
+            createEmployeePanel.add
+                             (employeePersonalInformation, BorderLayout.CENTER);
+            createEmployeePanel.add
+                                  (employeeWorkInformation, BorderLayout.SOUTH);
         }
 
         
@@ -274,18 +272,16 @@ public class UserGui extends JFrame
          */
         private void buildSearchEmployeePanel()
         {
-            searchEmployeePanel.setLayout(new FlowLayout());
-
-            // Text.
-            textSearchEmployees = new JTextField(15);
-            textSearchResults = new JTextArea();
-            textSearchResults.setEditable(false);
-            
-            // Panel.
+            JPanel searchEmpNorthPanel = new JPanel();
+            searchEmpNorthPanel.setLayout(new FlowLayout());
             g.border(searchEmployeePanel, "Search Employees:");
-            searchEmployeePanel.add(new JLabel("Search Employees:"));
-            searchEmployeePanel.add(textSearchEmployees);
-            searchEmployeePanel.add(textSearchResults);
+            searchEmpNorthPanel.add(new JLabel("Search Employees:"));
+            searchEmpNorthPanel.add(textSearchEmployees);          
+            areaSearchResults.setEditable(false);
+            searchEmployeePanel.setLayout(new BorderLayout());
+            JScrollPane scrollPane = new JScrollPane(areaSearchResults);
+            searchEmployeePanel.add(searchEmpNorthPanel, BorderLayout.NORTH);
+            searchEmployeePanel.add(scrollPane, BorderLayout.CENTER);
         }
 
 
@@ -294,29 +290,32 @@ public class UserGui extends JFrame
          */
         private void buildCreateProductPanel()
         {
-            createProductPanel.setLayout(new GridLayout(2,2));
-
-            // Create text boxes.
-            textProductName = new JTextField(15);
-            textProductCode = new JTextField(15);
-            textProductPrice = new JTextField(15);
-            textProductSummary = new JTextArea("Summary / Notes Here");
-
+            JPanel productNorthPanel = new JPanel();
+            productNorthPanel.setLayout(new GridLayout(3,2));
+            
+            areaProductSummary = new JTextArea("Summary / Notes Here");
+            
             // Database Connection Here
-
-            // Setup combo box for selecting manufacturers from the array.
             JComboBox manufacturers = new JComboBox();
             //manufacturers.setSelectedIndex(0);
 
             g.border(inventoryPanel, "Inventory Information");
-            createProductPanel.add(new JLabel("Name:"));
-            createProductPanel.add(textProductName);
-            createProductPanel.add(new JLabel("Code:"));
-            createProductPanel.add(textProductCode);
-            createProductPanel.add(new JLabel("Price:"));
-            createProductPanel.add(textProductPrice);
-            createProductPanel.add(new JLabel("Manufacturer:"));
-            createProductPanel.add(manufacturers);
+            productNorthPanel.add(new JLabel("Name:"));
+            productNorthPanel.add(textProductName);
+            productNorthPanel.add(new JLabel("Code:"));
+            productNorthPanel.add(textProductCode);
+            productNorthPanel.add(new JLabel("Price:"));
+            productNorthPanel.add(textProductPrice);
+            productNorthPanel.add(new JLabel("Manufacturer:"));
+            productNorthPanel.add(manufacturers);
+            productNorthPanel.add(new JLabel("Commission Rate:"));
+            productNorthPanel.add(textProductCommission);
+            
+            // Setup product panel.
+            createProductPanel.setLayout(new BorderLayout());
+            JScrollPane scrollPane = new JScrollPane(areaProductSummary);
+            createProductPanel.add(productNorthPanel, BorderLayout.NORTH);
+            createProductPanel.add(scrollPane, BorderLayout.CENTER);
         }
 
 
@@ -325,23 +324,23 @@ public class UserGui extends JFrame
          */
         private void buildCreateManufacturerPanel()
         {
-            createManufacturerPanel.setLayout(new GridLayout(2,2));
-
-            // Create text boxes.
-            textManufacturerName = new JTextField(15);
-            textManufacturerLocation = new JTextField(15);
-            textManufacturerPhoneNumber = new JTextField(15);
-            textManufacturerSalesAssociate = new JTextField(15);
-            textManufacturerSummary = new JTextArea("Summary / Notes Here");
-
-            createManufacturerPanel.add(new JLabel("Name:"));
-            createManufacturerPanel.add(textManufacturerName);
-            createManufacturerPanel.add(new JLabel("Location:"));
-            createManufacturerPanel.add(textManufacturerLocation);
-            createManufacturerPanel.add(new JLabel("Phone Number:"));
-            createManufacturerPanel.add(textManufacturerPhoneNumber);
-            createManufacturerPanel.add(new JLabel("Sales Associate:"));
-            createManufacturerPanel.add(textManufacturerSalesAssociate);
+            JPanel manNorthPanel = new JPanel();
+            manNorthPanel.setLayout(new GridLayout(2,2));
+            areaManufacturerSummary = new JTextArea("Summary / Notes Here");
+            manNorthPanel.add(new JLabel("Name:"));
+            manNorthPanel.add(textManufacturerName);
+            manNorthPanel.add(new JLabel("Location:"));
+            manNorthPanel.add(textManufacturerLocation);
+            manNorthPanel.add(new JLabel("Phone Number:"));
+            manNorthPanel.add(textManufacturerPhoneNumber);
+            manNorthPanel.add(new JLabel("Sales Associate:"));
+            manNorthPanel.add(textManufacturerSalesAssociate);
+            
+            // Setup manufacturing panel.
+            createManufacturerPanel.setLayout(new BorderLayout());
+            JScrollPane scrollPane = new JScrollPane(areaManufacturerSummary);
+            createManufacturerPanel.add(manNorthPanel, BorderLayout.NORTH);
+            createManufacturerPanel.add(scrollPane, BorderLayout.CENTER);
         }
 
 
@@ -351,15 +350,13 @@ public class UserGui extends JFrame
          */
         private void buildSearchInventoryPanel()
         {
-            searchInventoryPanel.setLayout(new FlowLayout());
+            JPanel invNorthPanel = new JPanel();
+            invNorthPanel.setLayout(new FlowLayout());
             ButtonGroup inventorySearchSelectionGroup = new ButtonGroup();
 
-            // Create text boxes.
-            textSearchInventory = new JTextField(15);
-            textSearchInventoryResults = new JTextArea();
-            textSearchInventoryResults.setEditable(false);
+            areaSearchInventory = new JTextArea();
+            areaSearchInventory.setEditable(false);
 
-            // Create buttons.
             JRadioButton
                 searchProducts = new JRadioButton("Search Products", true),
                 searchManufacturers = new JRadioButton
@@ -370,35 +367,52 @@ public class UserGui extends JFrame
             inventorySearchSelectionGroup.add(searchManufacturers);
 
             g.border(searchInventoryPanel, "Search Inventory:");
-            searchInventoryPanel.add(searchProducts);
-            searchInventoryPanel.add(searchManufacturers);
-            searchInventoryPanel.add(new JLabel("Search For:"));
-            searchInventoryPanel.add(textSearchInventory);
+            invNorthPanel.add(searchProducts);
+            invNorthPanel.add(searchManufacturers);
+            invNorthPanel.add(new JLabel("Search For:"));
+            invNorthPanel.add(textSearchInventory);
+            
+                       // Setup search inventory panel.
+            searchInventoryPanel.setLayout(new BorderLayout());
+            JScrollPane scrollPane = new JScrollPane(areaSearchInventory);
+            searchInventoryPanel.add(invNorthPanel, BorderLayout.NORTH);
+            searchInventoryPanel.add(scrollPane, BorderLayout.CENTER);
         }
 
-
+        /**
+         * This method creates the sales panels used for creating new orders.
+         */
         private void buildCreateSalesPanel()
         {
-            createSalesPanel.setLayout(new GridLayout(3,1));
+            JPanel salesNorthPanel = new JPanel();
+            salesNorthPanel.setLayout(new GridLayout(3,2));
 
-            // Create text boxes.
-            textQuantity = new JTextField(15);
-
-             // Database Connection Here
-
-            // Setup combo box for selecting manufacturers from the array.
+            // Database Connection Here
             JComboBox products = new JComboBox();
             //products.setSelectedIndex(0);
             JComboBox employees = new JComboBox();
             //employees.setSelectedIndex(0);
-
-            g.border(inventoryPanel, "Inventory Information");
-            createSalesPanel.add(new JLabel("Quantity:"));
-            createSalesPanel.add(textQuantity);
-            createSalesPanel.add(new JLabel("Product:"));
-            createSalesPanel.add(products);
-            createSalesPanel.add(new JLabel("Employee:"));
-            createSalesPanel.add(employees);
+            
+            g.border(salesNorthPanel, "Sales Information");
+            salesNorthPanel.add(new JLabel("Quantity:"));
+            salesNorthPanel.add(textSalesQuantity);
+            salesNorthPanel.add(new JLabel("Product:"));
+            salesNorthPanel.add(products);
+            salesNorthPanel.add(new JLabel("Employee:"));
+            salesNorthPanel.add(employees);
+            
+            JPanel salesSouthPanel = new JPanel();
+            salesSouthPanel.setLayout(new FlowLayout());
+            salesSouthPanel.add(createButton);
+            salesSouthPanel.add(clearButton);
+            
+            // Action Listeners.
+            createButton.addActionListener(new CreateButtonListener());
+            clearButton.addActionListener(new ClearSalesButtonListener());
+            
+            createSalesPanel.setLayout(new BorderLayout());
+            createSalesPanel.add(salesNorthPanel, BorderLayout.NORTH);
+            createSalesPanel.add(salesSouthPanel, BorderLayout.SOUTH);
         }
 
 
@@ -426,14 +440,16 @@ public class UserGui extends JFrame
             @Override 
             public void actionPerformed(ActionEvent event)
             {
-                // If Statement.
-                if (JOptionPane.showConfirmDialog(null, 
+                if 
+                (
+                    JOptionPane.showConfirmDialog(null, 
                     "Are you sure you want to exit?",
-                    "Exit?", JOptionPane.OK_CANCEL_OPTION)==JOptionPane.OK_OPTION)
+                    "Exit?", 
+                    JOptionPane.OK_CANCEL_OPTION)==JOptionPane.OK_OPTION
+                )
                 {
                     System.exit(0);
                 }
-                // ELSE: do nothing.
             }
         } // End of ExitButtonListener inner class.
 
@@ -446,23 +462,114 @@ public class UserGui extends JFrame
             @Override 
             public void actionPerformed(ActionEvent event)
             {
-                // If Statement.
-                if (JOptionPane.showConfirmDialog(null, 
+                if 
+                (
+                    JOptionPane.showConfirmDialog(null, 
                     "Are you sure you want to submit?",
-                    "Exit?", JOptionPane.OK_CANCEL_OPTION)==JOptionPane.OK_OPTION)
+                    "Submit?", 
+                    JOptionPane.OK_CANCEL_OPTION)==JOptionPane.OK_OPTION
+                )
                 {
                     // Add to database.
                 }
-                // ELSE: do nothing.
             }
         } // End of SubmitButtonListener inner class.
 
+        
+        /**
+         * Private inner class for event handling.
+         */
+        private class ClearSalesButtonListener implements ActionListener
+        {
+            @Override 
+            public void actionPerformed(ActionEvent event)
+            {
+                if 
+                (
+                    JOptionPane.showConfirmDialog(null, 
+                    "Are you sure you want to clear?",
+                    "Clear?", 
+                    JOptionPane.OK_CANCEL_OPTION)==JOptionPane.OK_OPTION
+                )
+                {
+                    // Clear fields.
+                    textSalesQuantity.setText("");
+                }
+            }
+        } // End of ClearButtonListener inner class.
+        
 
+        /**
+         * Private inner class for event handling.
+         */
+        private class CreateButtonListener implements ActionListener
+        {
+            @Override 
+            public void actionPerformed(ActionEvent event)
+            {
+                if 
+                (
+                    JOptionPane.showConfirmDialog(null, 
+                    "Are you sure you want to create?",
+                    "Create?", 
+                    JOptionPane.OK_CANCEL_OPTION)==JOptionPane.OK_OPTION
+                )
+                {
+                    // Add to database.
+                }
+            }
+        } // End of CreateButtonListener inner class.
+        
+        
+        /**
+         * Private inner class for event handling.
+         */
+        private class EditButtonListener implements ActionListener
+        {
+            @Override 
+            public void actionPerformed(ActionEvent event)
+            {
+                if 
+                (
+                    JOptionPane.showConfirmDialog(null, 
+                    "Are you sure you want to save changes?",
+                    "Update?", 
+                    JOptionPane.OK_CANCEL_OPTION)==JOptionPane.OK_OPTION
+                )
+                {
+                    // Update the database.
+                }
+            }
+        } // End of EditButtonListener inner class.
+        
+        
+        /**
+         * Private inner class for event handling.
+         */
+        private class DeleteButtonListener implements ActionListener
+        {
+            @Override 
+            public void actionPerformed(ActionEvent event)
+            {
+                if 
+                (
+                    JOptionPane.showConfirmDialog(null, 
+                    "Are you sure you want to delete?",
+                    "Delete?", 
+                    JOptionPane.OK_CANCEL_OPTION)==JOptionPane.OK_OPTION
+                )
+                {
+                    // Delete from database.
+                }
+            }
+        } // End of DeleteButtonListener inner class.
+        
+        
         /**
          * Radio button handler listens for changes and updates text fields to
          * reflect what is available.
          */
-        private class RadioButtonHandler implements ItemListener
+        private class EmpRadioButtonHandler implements ItemListener
         {
             @Override
             public void itemStateChanged(ItemEvent event)
@@ -599,84 +706,24 @@ public class UserGui extends JFrame
     }
     
     
-    public void setupPanels()
-    {
-        // Build search table area.
-        //buildTables();
-        
-        /* ---- Setup Employee Panel ---------------------------------------- */
-            createEmployeePanel.setLayout(new BorderLayout());
-            createEmployeePanel.add(employeeSelectionPanel, BorderLayout.NORTH);
-            createEmployeePanel.add
-                             (employeePersonalInformation, BorderLayout.CENTER);
-            createEmployeePanel.add
-                                  (employeeWorkInformation, BorderLayout.SOUTH);
-
-            // Initialize defaults values.
-            textCommissionRate.setEditable(false);
-            textHourlyRate.setEditable(false);
-            
-            // Add the human resources search panels to the main search panel.
-            searchEmployeeMasterPanel.setLayout(new BorderLayout());
-            JScrollPane scrollHRPane = new JScrollPane(textSearchResults);
-            searchEmployeeMasterPanel.add
-                                      (searchEmployeePanel, BorderLayout.NORTH);
-            searchEmployeeMasterPanel.add(scrollHRPane, BorderLayout.CENTER);
-        /* ---- End of Setup Employee Panel --------------------------------- */
-        
-        /* ---- Setup Inventory Panel --------------------------------------- */
-            // Setup search inventory panel.
-            searchInventoryMasterPanel.setLayout(new BorderLayout());
-            JScrollPane scrollInventoryPane
-                                  = new JScrollPane(textSearchInventoryResults);
-            searchInventoryMasterPanel.add
-                                     (searchInventoryPanel, BorderLayout.NORTH);
-            searchInventoryMasterPanel.add
-                              (scrollInventoryPane, BorderLayout.CENTER);
-
-            // Setup product panel.
-            createProductMasterPanel.setLayout(new BorderLayout());
-            JScrollPane scrollProductPane
-                                          = new JScrollPane(textProductSummary);
-            createProductMasterPanel.add
-                                       (createProductPanel, BorderLayout.NORTH);
-            createProductMasterPanel.add
-                                       (scrollProductPane, BorderLayout.CENTER);
-
-            // Setup manufacturing panel.
-            createManufacturerMasterPanel.setLayout(new BorderLayout());
-            JScrollPane scrollManufacturerPane
-                                     = new JScrollPane(textManufacturerSummary);
-            createManufacturerMasterPanel.add
-                                  (createManufacturerPanel, BorderLayout.NORTH);
-            createManufacturerMasterPanel.add
-                                  (scrollManufacturerPane, BorderLayout.CENTER);
-        /* ---- End of Setup Inventory Panel -------------------------------- */
-    }
-    
-    
     public void setupTabs()
     {
+        // Human Resources Tabs.
+        g.setTab(hrTabPane, createEmployeePanel, "Create");
+        g.setTab(hrTabPane, searchEmployeePanel, "Search");
+        
         // Sub Inventory Tabs.
-        subInventoryTabPane.addTab
-                         ("Product", null, createProductMasterPanel, "Product");
-        subInventoryTabPane.addTab
-          ("Manufacturer", null, createManufacturerMasterPanel, "Manufacturer");
-
-        // Sales Tab.
-        salesTabPane.addTab("Create", null, createSalesPanel, "Create");
-        salesTabPane.addTab("Search", null, searchSalesPanel, "Search");    
-
+        g.setTab(subInventoryTabPane, createProductPanel, "Product");
+        g.setTab(subInventoryTabPane, createManufacturerPanel, "Manufacturer");
+        
         // Inventory Tabs.
         inventoryTabPane.addTab("Create", null, subInventoryTabPane, "Create");
-        inventoryTabPane.addTab
-                         ("Search", null, searchInventoryMasterPanel, "Search");    
-
-        // Human Resources Tabs.
-        hrTabPane.addTab
-              ("Create Employee", null, createEmployeePanel, "Create Employee");
-        hrTabPane.addTab("Search", null, searchEmployeeMasterPanel, "Search");
-
+        g.setTab(inventoryTabPane, searchInventoryPanel, "Search");
+        
+        // Sales Tab.
+        g.setTab(salesTabPane, createSalesPanel, "Create");
+        g.setTab(salesTabPane, searchSalesPanel, "Search");
+        
         // Setup main tabs.
         mainTabPane.addTab("HR", null , hrTabPane, "HR");
         mainTabPane.addTab("Inventory", null, inventoryTabPane, "Inventory");

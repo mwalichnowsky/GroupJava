@@ -132,7 +132,7 @@ String
             runGui(isAdmin);
         }
         
-        boolean isAdmin = false; // Database 
+        boolean isAdmin = true; // Database 
             runGui(isAdmin);
     }
     /* ----------------------- Methods -------------------------------------- */

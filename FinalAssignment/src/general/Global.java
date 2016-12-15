@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import javax.swing.BorderFactory;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 
 /**
  * @author Created by: Matthew Walichnowsky | 200171919
@@ -29,7 +30,7 @@ public class Global
         }
     /////////////////////// End of get and set methods. ////////////////////////
         
-    public static void border(JPanel panel, String string)
+    public void border(JPanel panel, String string)
     {
         panel.setBorder(BorderFactory.createTitledBorder(string));
     }
@@ -50,5 +51,11 @@ public class Global
         System.err.println(error.getMessage());
         JOptionPane.showMessageDialog
                               (null, errorString + "\n\n" + error.getMessage());
+    }
+    
+    
+    public void setTab(JTabbedPane pane, JPanel panel, String string)
+    {
+        pane.addTab(string, null, panel, string);
     }
 } // End of Global class.
