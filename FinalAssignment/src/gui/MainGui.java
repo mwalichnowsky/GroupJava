@@ -13,10 +13,11 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Vector;
 import javax.swing.table.DefaultTableModel;
         
-public class UserGui extends JFrame
+public class MainGui extends JFrame
 {
     /* ----------------------- Variables------------------------------------- */
         final private JTextField 
@@ -58,7 +59,12 @@ public class UserGui extends JFrame
                 
             /* Sales Field */
             textSalesQuantity = new JTextField(15), 
-            textSalesSearch = new JTextField(15)
+            textSalesSearch = new JTextField(15),
+                
+            /* Edit / Delete */
+            textEmployeeSelect = new JTextField(15),
+            textInventorySelect = new JTextField(15),
+            textSalesSelect = new JTextField(15)
         ;
         
         private JTextArea
@@ -73,16 +79,19 @@ public class UserGui extends JFrame
                 
             /* HR Panels */    
             createEmployeePanel = new JPanel(),
-            searchEmployeePanel = new JPanel(), 
+            searchEmployeePanel = new JPanel(),
+            editEmployeePanel = new JPanel(),
             
             /* Inventory Panels */    
             inventoryPanel = new JPanel(),
             searchInventoryPanel = new JPanel(),
+            editInventoryPanel = new JPanel(),
             createProductPanel  = new JPanel(), 
             createManufacturerPanel = new JPanel(), 
             
             /* Sales Panels */
-            createSalesPanel = new JPanel(), searchSalesPanel = new JPanel()
+            createSalesPanel = new JPanel(), searchSalesPanel = new JPanel(),
+            editSalesPanel = new JPanel()
         ;               
         
         final private JTable 
@@ -107,29 +116,41 @@ public class UserGui extends JFrame
             subInventoryTabPane = new JTabbedPane(), // Sub Inventory Tab.
             salesTabPane = new JTabbedPane() // Sales Tab.
         ;
-        
+                    
         final private JRadioButton 
+            /* Employee Radio Buttons */    
             basePlusCommissionEmployee = new JRadioButton
                                        ("Base Plus Commission Employee", false), 
             commissionEmployee = new JRadioButton("Comission Employee", false), 
             hourlyEmployee = new JRadioButton("Hourly Employee", false), 
-            salaryEmployee = new JRadioButton("Salary Employee", true)
+            salaryEmployee = new JRadioButton("Salary Employee", true),
+                
+            /* Inventory Radio Buttons */    
+            productButton = new JRadioButton("Products:", true),
+            manufacturerButton = new JRadioButton("Manufacturers:")
         ;
-            
+        
+        JLabel inventoryLabel = new JLabel("Products:");
+        
         Connection conn = null;
         Statement stat = null;
         ResultSet rs = null;
-                
+              
         // Set variable for calling our global methods.
         Global g = new Global();
+        
+        boolean isAdmin;
+        
+       
         
     /////////////////////// End of Variables ///////////////////////////////////
     
     /* ----------------------- Constructor ---------------------------------- */
         
-        public UserGui()
+        public MainGui(boolean isAdmin)
         {
             super("Prestige Worldwide");
+            this.isAdmin = isAdmin;
             setLayout(new BorderLayout());
             
             textCommissionRate.setEditable(false);
@@ -137,15 +158,21 @@ public class UserGui extends JFrame
             
             // Build Panels.
             buildHeaderPanel("Welcome to Management Box!");
-            buildCreateSalesPanel();
             buildCreateEmployeePanel();
             buildSearchEmployeePanel();
             buildSearchInventoryPanel();
             buildCreateProductPanel();
             buildCreateManufacturerPanel();
+            buildCreateSalesPanel();
             buildFooterPanel();
             
-            
+            if (isAdmin == true)
+            {
+                buildEditEmployeesPanel();
+                buildEditInventoryPanel();
+                buildEditSalesPanel();
+            }
+
             // Setup Tabs.
             setupTabs();
             
@@ -155,11 +182,10 @@ public class UserGui extends JFrame
             add(footerPanel, BorderLayout.SOUTH);
             
             pack();
-            
-            
         }
     /////////////////////// End of Constructor /////////////////////////////////
         
+    
     /* ----------------------- Build Panels --------------------------------- */ 
         /**
          * This creates a greetings panel.
@@ -181,7 +207,7 @@ public class UserGui extends JFrame
         private JPanel buildEmployeeSelectionPanel()
         {
             JPanel employeeSelectionPanel = new JPanel();
-        
+            
             // Add the buttons to the selection group.
             ButtonGroup employeeSelectionGroup = new ButtonGroup();
             employeeSelectionGroup.add(hourlyEmployee);
@@ -372,7 +398,7 @@ public class UserGui extends JFrame
             invNorthPanel.add(new JLabel("Search For:"));
             invNorthPanel.add(textSearchInventory);
             
-                       // Setup search inventory panel.
+            // Setup search inventory panel.
             searchInventoryPanel.setLayout(new BorderLayout());
             JScrollPane scrollPane = new JScrollPane(areaSearchInventory);
             searchInventoryPanel.add(invNorthPanel, BorderLayout.NORTH);
@@ -415,6 +441,115 @@ public class UserGui extends JFrame
             createSalesPanel.add(salesSouthPanel, BorderLayout.SOUTH);
         }
 
+        
+        /**
+         * This method creates the edit sales panels used for making
+         * changes to sales or deleting them.
+         */
+        private void buildEditSalesPanel()
+        {
+            JPanel editSalesNorthPanel = new JPanel();
+            editSalesNorthPanel.setLayout(new GridLayout(3,2));
+
+            // Database Connection Here
+            JComboBox products = new JComboBox();
+            //products.setSelectedIndex(0);
+            
+            g.border(editSalesNorthPanel, "Sales Information");
+            editSalesNorthPanel.add(new JLabel("Sale:"));
+            editSalesNorthPanel.add(products);
+            
+            JPanel editSalesSouthPanel = new JPanel();
+            editSalesSouthPanel.setLayout(new FlowLayout());
+            editSalesSouthPanel.add(editButton);
+            editSalesSouthPanel.add(deleteButton);
+            
+            // Action Listeners.
+            editButton.addActionListener(new EditButtonListener());
+            deleteButton.addActionListener(new DeleteButtonListener());
+            
+            editSalesPanel.setLayout(new BorderLayout());
+            editSalesPanel.add(editSalesNorthPanel, BorderLayout.NORTH);
+            editSalesPanel.add(editSalesSouthPanel, BorderLayout.SOUTH);
+        }
+        
+        
+        /**
+         * This method creates the edit employees panels used for making
+         * changes to employees or deleting them.
+         */
+        private void buildEditEmployeesPanel()
+        {
+            JPanel editEmpNorthPanel = new JPanel();
+            editEmpNorthPanel.setLayout(new GridLayout(3,2));
+
+            // Database Connection Here
+            JComboBox products = new JComboBox();
+            //products.setSelectedIndex(0);
+            
+            g.border(editEmpNorthPanel, "Employee Information");
+            editEmpNorthPanel.add(new JLabel("Employee:"));
+            editEmpNorthPanel.add(products);
+            
+            JPanel editEmpSouthPanel = new JPanel();
+            editEmpSouthPanel.setLayout(new FlowLayout());
+            editEmpSouthPanel.add(editButton);
+            editEmpSouthPanel.add(deleteButton);
+            
+            // Action Listeners.
+            editButton.addActionListener(new EditButtonListener());
+            deleteButton.addActionListener(new DeleteButtonListener());
+            
+            editEmployeePanel.setLayout(new BorderLayout());
+            editEmployeePanel.add(editEmpNorthPanel, BorderLayout.NORTH);
+            editEmployeePanel.add(editEmpSouthPanel, BorderLayout.SOUTH);
+        }
+        
+        
+        /**
+         * This method creates the edit inventory panel used for making
+         * changes to inventory or deleting them.
+         */
+        private void buildEditInventoryPanel()
+        {
+            JPanel editInvNorthPanel = new JPanel();
+            editInvNorthPanel.setLayout(new FlowLayout());
+            ButtonGroup editButtonGroup = new ButtonGroup();
+            editButtonGroup.add(productButton);
+            editButtonGroup.add(manufacturerButton);
+            editInvNorthPanel.add(productButton);
+            editInvNorthPanel.add(manufacturerButton);
+            
+            
+            JPanel editInvCenterPanel = new JPanel();
+            editInvCenterPanel.setLayout(new GridLayout(3,2));
+
+            // Database Connection Here
+            JComboBox products = new JComboBox();
+            //products.setSelectedIndex(0);
+            
+            g.border(editInvCenterPanel, "Inventory Information");
+            editInvCenterPanel.add(inventoryLabel);
+            editInvCenterPanel.add(products);
+            
+            JPanel editInvSouthPanel = new JPanel();
+            editInvSouthPanel.setLayout(new FlowLayout());
+            editInvSouthPanel.add(editButton);
+            editInvSouthPanel.add(deleteButton);
+            
+            // Action Listeners.
+            editButton.addActionListener(new EditButtonListener());
+            deleteButton.addActionListener(new DeleteButtonListener());
+            InvRadioButtonHandler rbHandler = new InvRadioButtonHandler();
+            productButton.addItemListener(rbHandler);
+            manufacturerButton.addItemListener(rbHandler);
+            
+            editInventoryPanel.setLayout(new BorderLayout());
+            editInventoryPanel.add(editInvNorthPanel, BorderLayout.NORTH);
+            editInventoryPanel.add(editInvCenterPanel, BorderLayout.CENTER);
+            editInventoryPanel.add(editInvSouthPanel, BorderLayout.SOUTH);
+        }
+        
 
         /**
          * This creates the panel for our button.
@@ -615,6 +750,30 @@ public class UserGui extends JFrame
         
         
         /**
+         * Radio button handler listens for changes and updates text fields to
+         * reflect what is available.
+         */
+        private class InvRadioButtonHandler implements ItemListener
+        {
+            @Override
+            public void itemStateChanged(ItemEvent event)
+            {
+                //set the textfields to visible based on what radio button is selected
+                //set the salary text field to be visible
+                if(productButton.isSelected())
+                {
+                    inventoryLabel.setText("Products");
+                }
+                //set the hourly text field to be visible
+                else if(manufacturerButton.isSelected())
+                {
+                    inventoryLabel.setText("Manufacturers");
+                }
+            }
+        }//end of handler
+        
+        
+        /**
          * Private inner class for event handling.
          */
         private class ComboBoxListener implements ActionListener
@@ -723,6 +882,14 @@ public class UserGui extends JFrame
         // Sales Tab.
         g.setTab(salesTabPane, createSalesPanel, "Create");
         g.setTab(salesTabPane, searchSalesPanel, "Search");
+        
+        // Admin tabs.
+        if (isAdmin == true)
+        {
+            g.setTab(hrTabPane, editEmployeePanel, "Edit/Delete");
+            g.setTab(inventoryTabPane, editInventoryPanel, "Edit/Delete");
+            g.setTab(salesTabPane, editSalesPanel, "Edit/Delete");
+        }
         
         // Setup main tabs.
         mainTabPane.addTab("HR", null , hrTabPane, "HR");

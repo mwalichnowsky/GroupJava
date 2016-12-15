@@ -138,29 +138,15 @@ String
     /* ----------------------- Methods -------------------------------------- */
         /**
          * This method checks if the user is a Admin or not.
-         * Then runs UserGui or AdminGui.
+         * Then runs UserGui or MainGui.
          * @param isAdmin 
          */
         public void runGui(boolean isAdmin)
         {
-            // If User.
-            if ( isAdmin == false )
-            {
-                // User GUI.
-                UserGui userGui = new UserGui();
-                userGui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                userGui.pack();
-                userGui.setVisible(true);
-            }
-            // If Admin.
-            else if ( isAdmin == true )
-            {
-                // Admin GUI.
-                AdminGui adminGui = new AdminGui();
-                adminGui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                adminGui.pack();
-                adminGui.setVisible(true);
-            }
+            MainGui mainGui = new MainGui(isAdmin);
+            mainGui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            mainGui.pack();
+            mainGui.setVisible(true);
         } // End of runGui.
     /////////////////////// End of methods /////////////////////////////////////
     
