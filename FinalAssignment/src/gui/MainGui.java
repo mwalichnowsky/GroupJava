@@ -514,6 +514,7 @@ public class MainGui extends JFrame
             
             // Setup search inventory panel.
             searchInventoryPanel.setLayout(new BorderLayout());
+            // if statment to deciede what table to use
             if(chooseProdocutOrManufacturer ==0)
             {
             searchInventoryPanel.validate();
@@ -523,6 +524,7 @@ public class MainGui extends JFrame
             searchInventoryPanel.add(scrollPane, BorderLayout.CENTER);
             searchInventoryPanel.add(searchInventorySouthPanel, BorderLayout.SOUTH);
             }
+            // if statment to deciede what table to use
             else if(chooseProdocutOrManufacturer ==1)
             {
             searchInventoryPanel.validate();
@@ -557,6 +559,7 @@ public class MainGui extends JFrame
             @Override
             public void itemStateChanged(ItemEvent event)
             {
+                // this will be used to determine what table is selected
                 chooseProdocutOrManufacturer = -1;
                 //set the textfields to visible based on what radio button is selected
                 
@@ -1100,6 +1103,7 @@ public class MainGui extends JFrame
     }
     
     
+    // search for a Employee
     public void searchEmployee()
     {
         try {
@@ -1108,10 +1112,10 @@ public class MainGui extends JFrame
 
             final String DB_URL = "jdbc:mysql://sql.computerstudi.es:3306/gc200315409";
             
-        
             String test = textSearchEmployees.getText().toString();
             final String QRY = "SELECT * FROM employee WHERE firstname LIKE '%"+test+"%';";
             
+            // reseting the sql variables
             Connection conn = null;
             Statement stat = null;
             ResultSet result = null;
@@ -1126,7 +1130,6 @@ public class MainGui extends JFrame
 
                 
                 int columnsNumber = rsmd.getColumnCount();
-                ArrayList<Integer> resultList = new ArrayList<Integer>();
                 while (result.next()) 
                 {
                     //Print one row          
@@ -1141,14 +1144,11 @@ public class MainGui extends JFrame
                 result.close();
                 stat.close();
                 conn.close();
-
             }
             catch(SQLException error)
             {
                 System.out.println(error);
             }
-            
-            
  
         }catch (NullPointerException e1) {
             System.out.println(e1);
@@ -1158,6 +1158,7 @@ public class MainGui extends JFrame
         }
     }
     
+    // method to insert a product
     public void insertProduct()
             throws SQLException
     { String userName = "gc200315409";
@@ -1187,6 +1188,7 @@ public class MainGui extends JFrame
    
     }
     
+    // A method to insert a new manufactuer
     public void insertManufacturer()
     {
         String userName = "gc200315409";
@@ -1213,24 +1215,27 @@ public class MainGui extends JFrame
         }
     }
     
+    // a method to search for either product or manufactuer
     public void searchProductOrManufacturer()
     {
-        
-            String userName = "gc200315409";
-            String password = "?8pDT38G";
+         
+        String userName = "gc200315409";
+        String password = "?8pDT38G";
 
-            final String DB_URL = "jdbc:mysql://sql.computerstudi.es:3306/gc200315409";
-                            System.out.println(chooseProdocutOrManufacturer);
+        final String DB_URL = "jdbc:mysql://sql.computerstudi.es:3306/gc200315409";
+                 
 
-            String test = textSearchInventory.getText().toString();
+        String test = textSearchInventory.getText().toString();
             
+            // to get the user input for a Product
             if(chooseProdocutOrManufacturer == 0)
             {
+                // getting the submited text
                 final String QRY = "SELECT * FROM products WHERE name LIKE '%"+test+"%';";
             
-            Connection conn = null;
-            Statement stat = null;
-            ResultSet result = null;
+                Connection conn = null;
+                Statement stat = null;
+                ResultSet result = null;
             
             try
             {
@@ -1239,7 +1244,7 @@ public class MainGui extends JFrame
                 
                 result = stat.executeQuery(QRY);
                 ResultSetMetaData rsmd = result.getMetaData();
-
+                // gettinf the data to display in a table 
                 int columnsNumber = rsmd.getColumnCount();
                 while (result.next()) {
                 //Print one row          
@@ -1267,9 +1272,10 @@ public class MainGui extends JFrame
                  System.out.println(e);
              }
           }
+            // to select a manufactuer
             else if( chooseProdocutOrManufacturer == 1)
             {
-                System.out.println(chooseProdocutOrManufacturer);
+                // select statement to get user inupt for a manufactuer
                 final String QRY = "SELECT * FROM manufacturer WHERE name LIKE '%"+test+"%';";
             
             Connection conn = null;
@@ -1313,6 +1319,7 @@ public class MainGui extends JFrame
             }
     }
     
+    // a method to insert a sale
     public void insertSales()
     {
         String userName = "gc200315409";
@@ -1327,9 +1334,8 @@ public class MainGui extends JFrame
             String SQL = "INSERT INTO sales"
                 + " (`quantity`, `product`, `employee`)"
                 + "VALUES ('"+textSalesQuantity.getText()+"', '"+ textManufacturerLocation.getText()+"', '"+ textManufacturerPhoneNumber.getText()+"');";
-
-        System.out.println(SQL);
         stat.executeUpdate(SQL);
+        
         } catch (SQLException e) {
             System.out.println(e);
         }
