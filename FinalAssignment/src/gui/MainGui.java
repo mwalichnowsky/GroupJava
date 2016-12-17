@@ -352,7 +352,7 @@ public class MainGui extends JFrame
         private void buildCreateProductPanel()
         {
             JPanel productNorthPanel = new JPanel();
-            productNorthPanel.setLayout(new GridLayout(3,2));
+            productNorthPanel.setLayout(new GridLayout(2,4));
             
             greaterProductPanel.setLayout(new BorderLayout());
             JButton searchProductButton = new JButton("Submit");
@@ -415,8 +415,6 @@ public class MainGui extends JFrame
             productNorthPanel.add(textProductPrice);
             productNorthPanel.add(new JLabel("Manufacturer:"));
             productNorthPanel.add(manufacturers);
-            productNorthPanel.add(new JLabel("Commission Rate:"));
-            productNorthPanel.add(textProductCommission);
             
             // Setup product panel.
             createProductPanel.setLayout(new BorderLayout());
