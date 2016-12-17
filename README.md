@@ -1,2 +1,2 @@
 # GroupJava
-# Branden/Mike/Zachary you're useless.
+# Mike/Zachary you're useless.
