@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package humanResources;
 
 import java.time.LocalDate;
@@ -24,24 +19,23 @@ public class SalaryEmployee extends Employee
             String firstName, 
             String lastName,
             String gender,
+            int age,
             String address,
             LocalDate dateOfBirth, 
             String phoneNumber,
             int sin, 
-            int employeeNumber,
             LocalDate dateHired, 
             String position,
             String status,
             double salary,
-            String department,
-            double grossSales, 
-            double commissionRate            
+            String department
+           
         )
         {
             super
             (
                 firstName, lastName, gender, address, dateOfBirth, phoneNumber, 
-                sin, employeeNumber, dateHired, position, status, department
+                sin,  dateHired, position, status, department
             );
             setSalaryRate(salaryRate);
         }

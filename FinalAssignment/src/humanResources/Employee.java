@@ -12,7 +12,7 @@ public class Employee
         private String firstName, lastName, address, position, status,
                        gender, phoneNumber, department;
         private LocalDate dateOfBirth, dateHired, today;
-        private int employeeNumber, age, sin;
+        private int age, sin;
         private double payRate, earnings;
         private static int employeeCount;
     /////////////////////// End of Variables ///////////////////////////////////
@@ -44,7 +44,6 @@ public class Employee
             LocalDate dateOfBirth, 
             String phoneNumber,
             int sin,
-            int employeeNumber,  
             LocalDate dateHired, 
             String position,
             String status,
@@ -58,7 +57,6 @@ public class Employee
             setDateOfBirth(dateOfBirth);
             setPhoneNumber(phoneNumber);
             setSin(sin);
-            setEmployeeNumber(employeeNumber);
             setDateHired(dateHired);
             setPosition(position);
             setStatus(status);
@@ -240,25 +238,6 @@ public class Employee
         } // End of setSin method.
 
     //-------Personal Info Up--------Work Info Down---------------------------//    
-    
-        /**
-         * This method returns the employees employeeNumber as a int.
-         * @return employeeNumber
-         */
-        public int getEmployeeNumber()
-        {
-            return this.employeeNumber;
-        }
-
-        
-        /**
-         * This method sets the employees employeeNumber as a int.
-         * @param employeeNumber
-         */
-        public void setEmployeeNumber(int employeeNumber)
-        {
-            this.employeeNumber = employeeNumber++;
-        }
 
         
         /**
@@ -390,7 +369,6 @@ public class Employee
             employeeInfo+= "\nName:\t\t" + getFirstName() + getLastName();
             employeeInfo+= "\nAge:\t\t" + getAge();
             employeeInfo+= "\nPosition:\t" + getPosition();
-            employeeInfo+= "\nEmployee Id:\t" + getEmployeeNumber();
             employeeInfo+= "\nHire Date:\t" + getDateHired();
         
             return employeeInfo;

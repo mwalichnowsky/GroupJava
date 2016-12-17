@@ -83,7 +83,7 @@ String
             System.out.println(loginUser + loginPassword);
             
             // Try to to connect.
-            try
+            /*try
             {
                 conn = DriverManager.getConnection
                 (
@@ -117,7 +117,7 @@ String
                 }
             }
             // General Error.
-            catch (Exception error){ g.generalError(error, "General Error"); }
+            catch (Exception error){ g.generalError(error, "General Error"); }*/
 
         } // End of do statement.
         while
