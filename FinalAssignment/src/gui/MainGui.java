@@ -2,7 +2,7 @@ package gui;
 
 /**
  * @author Matthew Walichnowsky | 200171919
- * Brandens Db - username gc200315409
+ * Branden's Db - username gc200315409
  * password- ?8pDT38G
  * url -https://phpmyadmin.dreamhost.com/?hostname=sql.computerstudi.es
  */
@@ -1169,10 +1169,11 @@ public class MainGui extends JFrame
         conn = DriverManager.getConnection(DB_URL, userName,password);
 
         try {
+            String value=manufacturers.getSelectedItem().toString();
             stat = conn.createStatement();
             String SQL = "INSERT INTO products"
                 + " (`name`, `code`, `price`, `manufacturer`)"
-                + "VALUES ('"+textProductName.getText()+"', '"+ textProductCode.getText()+"', '"+ textProductPrice.getText()+"', '"+manufacturers.getSelectedIndex()+ "');";
+                + "VALUES ('"+textProductName.getText()+"', '"+ textProductCode.getText()+"', '"+ textProductPrice.getText()+"', '"+value+  "');";
                 
             
             System.out.println("hi");
