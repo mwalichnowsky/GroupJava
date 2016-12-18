@@ -128,4 +128,23 @@ public class Global
         JOptionPane.showMessageDialog
                               (null, errorString + "\n\n" + error.getMessage());
     }//End of generalError
+    
+    
+    public String getDb()
+    {
+        return "jdbc:mysql://sql.computerstudi.es:3306/gc200315409";
+    }
+    
+    
+    public String getDbUser()
+    {
+        return "gc200315409";
+    }
+        
+        
+    public String getDbPass()
+    {
+        return "?8pDT38G";
+    }
+    
 } // End of Global class.

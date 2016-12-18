@@ -27,7 +27,9 @@ public class MainGui extends JFrame
 {
     /* ----------------------- Variables------------------------------------- */
     
-         private JComboBox manufacturers = new JComboBox();
+        private JComboBox 
+            manufacturers = new JComboBox(), employees = new JComboBox()
+        ;
          
         final private JTextField 
                 
@@ -586,8 +588,7 @@ public class MainGui extends JFrame
             JPanel editEmpNorthPanel = new JPanel();
             editEmpNorthPanel.setLayout(new GridLayout(3,2));
 
-            // Database Connection Here
-            JComboBox employees = new JComboBox();
+            populateEmployeeComboBox();
             
             g.border(editEmpNorthPanel, "Employee Information");
             editEmpNorthPanel.add(new JLabel("Employee:"));
@@ -914,9 +915,7 @@ public class MainGui extends JFrame
             @Override 
             public void actionPerformed(ActionEvent event)
             {
-                //String selection = items.getSelectedItem().toString();
-                
-                //read(selection);
+                //populateEmployeeComboBox();
             }
         } // End of SubmitButtonListener inner class.
         
@@ -1171,48 +1170,66 @@ public class MainGui extends JFrame
     }//End of insertEmployee
     
     
+    public void populateEmployeeComboBox()
+    {
+        try
+        {
+            final String qry = "SELECT * FROM employee ";
+            
+            conn = DriverManager.getConnection
+            (
+                g.getDb(), g.getDbUser(), g.getDbPass()
+            );
+            
+            stat = conn.createStatement();
+            
+            rs = stat.executeQuery(qry);
+            
+            while (rs.next())
+            {
+                employees.addItem(rs.getString("firstName"));
+            }
+        }
+        catch (SQLException e) 
+        {
+            g.sqlError(e, "");
+        } 
+    }
+    
+    
     // search for a Employee
     public void searchEmployee()
     {
         try 
         {
-            String userName = "gc200315409";
-            String password = "?8pDT38G";
-
-            final String DB_URL = 
-                           "jdbc:mysql://sql.computerstudi.es:3306/gc200315409";
-            
             String text = textSearchEmployees.getText();
             
             final String QRY = "SELECT * FROM employee "
                              + "WHERE firstname LIKE '%"+text+"%';";
             
-            // reseting the sql variables
-            Connection conn = null;
-            Statement stat = null;
-            ResultSet result = null;
-            
             try
             {
-                conn = DriverManager.getConnection(DB_URL, userName, password);
+                conn = DriverManager.getConnection
+                (
+                    g.getDb(), g.getDbUser(), g.getDbPass()
+                );
+                
                 stat = conn.createStatement();
-                
-                result = stat.executeQuery(QRY);
-                ResultSetMetaData rsmd = result.getMetaData();
+                rs = stat.executeQuery(QRY);
+                ResultSetMetaData rsmd = rs.getMetaData();
 
-                
                 int columnsNumber = rsmd.getColumnCount();
-                while (result.next()) 
+                while (rs.next()) 
                 {
                     //Print one row          
                     for(int i = 1 ; i <= columnsNumber; i++)
                     {
-                        System.out.print(result.getString(i) + " "); //Print one element of a row
-                        employeeSearchTable.setModel(buildTableModel(result)); //Print one element of a row
+                        System.out.print(rs.getString(i) + " "); //Print one element of a row
+                        employeeSearchTable.setModel(buildTableModel(rs)); //Print one element of a row
                         System.out.println(QRY);
                     }          
                 }
-                result.close();
+                rs.close();
                 stat.close();
                 conn.close();
             }
@@ -1237,20 +1254,24 @@ public class MainGui extends JFrame
     public void insertProduct()
             throws SQLException
     { 
-        String userName = "gc200315409";
-        String password = "?8pDT38G";
-        
-        final String DB_URL = "jdbc:mysql://sql.computerstudi.es:3306/gc200315409";
-        conn = DriverManager.getConnection(DB_URL, userName,password);
+        conn = DriverManager.getConnection
+        (
+            g.getDb(), 
+            g.getDbUser(),
+            g.getDbPass()
+        );
 
-        try {
+        try 
+        {
             String value = manufacturers.getSelectedItem().toString();
             
             stat = conn.createStatement();
             
             String SQL = "INSERT INTO products"
                 + " (`name`, `code`, `price`, `manufacturer`)"
-                + "VALUES ('"+textProductName.getText()+"', '"+ textProductCode.getText()+"', '"+ textProductPrice.getText()+"', '"+value+  "');";
+                + "VALUES ('" + textProductName.getText() + "', '" 
+                + textProductCode.getText() + "', '" 
+                + textProductPrice.getText() + "', '" + value +  "');";
                 
             //System.out.println(SQL);
             stat.executeUpdate(SQL);
@@ -1269,16 +1290,13 @@ public class MainGui extends JFrame
     // A method to insert a new manufactuer
     public void insertManufacturer()
     {
-        String userName = "gc200315409";
-        String password = "?8pDT38G";
-        
-        final String DB_URL = "jdbc:mysql://sql.computerstudi.es:3306/gc200315409";
-        
-
-        try {
-            conn = DriverManager.getConnection(DB_URL, userName,password);
-            stat = conn.createStatement();
-
+        try 
+        {
+            conn = DriverManager.getConnection
+            (
+                g.getDb(), g.getDbUser(), g.getDbPass()
+            );
+            
             stat = conn.createStatement();
             
             String SQL = "INSERT INTO products"
@@ -1304,13 +1322,6 @@ public class MainGui extends JFrame
     // a method to search for either product or manufactuer
     public void searchProductOrManufacturer()
     {
-         
-        String userName = "gc200315409";
-        String password = "?8pDT38G";
-
-        final String DB_URL = "jdbc:mysql://sql.computerstudi.es:3306/gc200315409";
-                 
-
         String test = textSearchInventory.getText();
             
             // to get the user input for a Product
@@ -1319,25 +1330,26 @@ public class MainGui extends JFrame
                 // getting the submited text
                 final String QRY = "SELECT * FROM products WHERE name LIKE '%"+test+"%';";
             
-                Connection conn = null;
-                Statement stat = null;
-                ResultSet result = null;
-            
                 try
                 {
-                    conn = DriverManager.getConnection(DB_URL, userName, password);
+                    conn = DriverManager.getConnection
+                    (
+                        g.getDb(), 
+                        g.getDbUser(),
+                        g.getDbPass()
+                    );
                     stat = conn.createStatement();
 
-                    result = stat.executeQuery(QRY);
-                    ResultSetMetaData rsmd = result.getMetaData();
+                    rs = stat.executeQuery(QRY);
+                    ResultSetMetaData rsmd = rs.getMetaData();
                     // gettinf the data to display in a table 
                     int columnsNumber = rsmd.getColumnCount();
-                    while (result.next()) {
+                    while (rs.next()) {
                     //Print one row          
                         for(int i = 1 ; i <= columnsNumber; i++){
 
                             //System.out.print(result.getString(i) + " "); //Print one element of a row
-                            productSearchTable.setModel(buildTableModel(result)); //Print one element of a row
+                            productSearchTable.setModel(buildTableModel(rs)); //Print one element of a row
                             //System.out.println(QRY);
 
                         }//End of forloop        
@@ -1364,24 +1376,25 @@ public class MainGui extends JFrame
                 // select statement to get user inupt for a manufactuer
                 final String QRY = "SELECT * FROM manufacturer WHERE name LIKE '%"+test+"%';";
             
-                Connection conn = null;
-                Statement stat = null;
-                ResultSet result = null;
-            
                 try
                 {
-                    conn = DriverManager.getConnection(DB_URL, userName, password);
+                    conn = DriverManager.getConnection
+                    (
+                        g.getDb(), 
+                        g.getDbUser(),
+                        g.getDbPass()
+                    );
                     stat = conn.createStatement();
 
-                    result = stat.executeQuery(QRY);
-                    ResultSetMetaData rsmd = result.getMetaData();
+                    rs = stat.executeQuery(QRY);
+                    ResultSetMetaData rsmd = rs.getMetaData();
 
                     int columnsNumber = rsmd.getColumnCount();
-                    while (result.next()) {
+                    while (rs.next()) {
                         //Print one row          
                         for(int i = 1 ; i <= columnsNumber; i++){
                             //System.out.print(result.getString(i) + " "); //Print one element of a row
-                            manufacturerSearchTable.setModel(buildTableModel(result)); //Print one element of a row
+                            manufacturerSearchTable.setModel(buildTableModel(rs)); //Print one element of a row
                             //System.out.println(QRY);
 
                         }//End of forloop           
@@ -1406,14 +1419,14 @@ public class MainGui extends JFrame
     // a method to insert a sale
     public void insertSales()
     {
-        String userName = "gc200315409";
-        String password = "?8pDT38G";
-        
-        final String DB_URL = "jdbc:mysql://sql.computerstudi.es:3306/gc200315409";
-        
-
-        try {
-            conn = DriverManager.getConnection(DB_URL, userName,password);
+        try 
+        {
+            conn = DriverManager.getConnection
+                    (
+                        g.getDb(), 
+                        g.getDbUser(),
+                        g.getDbPass()
+                    );
             
             stat = conn.createStatement();
             

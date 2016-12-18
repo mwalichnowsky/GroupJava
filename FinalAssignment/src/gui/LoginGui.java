@@ -50,13 +50,6 @@ public class LoginGui extends JFrame
     {
         // Items to hold selected data.
         JPanel loginPanel = new JPanel();
-
-        final String DB_URL 
-                  = "jdbc:mysql://sql.computerstudi.es:3306/gc200315409";
-        String
-            databaseUser = "gc200315409", 
-            databasePassword = "?8pDT38G"
-        ;
                     
         final JTextField textUsername = new JTextField(15);
         final JPasswordField textPassword = new JPasswordField(15);
@@ -90,7 +83,6 @@ public class LoginGui extends JFrame
                 null,
                 buttonOptions,
                 buttonOptions[0]
-                //cancelButton
             );
             
             loginUser = textUsername.getText();
@@ -102,14 +94,14 @@ public class LoginGui extends JFrame
             {
                 connection = DriverManager.getConnection
                 (
-                    DB_URL, databaseUser, databasePassword
+                    g.getDb(), g.getDbUser(), g.getDbPass()
                 );
-
+                
                 if (connection != null)
                 {
                     String 
                         sql = "SELECT * FROM users "
-                            + "WHERE username = '"+loginUser+"' ",
+                            + "WHERE username = '" + loginUser + "' ",
                         rsUser = "jhljhlh", rsPassword = "tsrusy"
                     ;
                     int rsId = 0;
@@ -147,6 +139,10 @@ public class LoginGui extends JFrame
                     {
                         System.out.println("Error, wrong username.");
                     }
+                    
+                    //rs.close();
+                    //stat.close();
+                    //connection.close();
                 }
             } // End of try.
 
@@ -203,22 +199,7 @@ public class LoginGui extends JFrame
             databaseLoopCounter < 3
         );
         
-        if (databaseCredidentialCheck == true)
-        {
-            /*
-            try
-            {
-                rs.close();
-                stat.close();
-                connection.close();
-            }
-            catch (SQLException error) 
-            { 
-                g.sqlError(error, "Error closing connection");
-            }
-            */
-            runGui(isAdmin);
-        }
+        if (databaseCredidentialCheck == true) { runGui(isAdmin); }
     }
     
     
