@@ -75,6 +75,4 @@ public class BasePlusCommissionEmployee extends CommissionEmployee
     {
         return super.toString() + "\nSalary: " + getSalary();
     } // End of toString method.
-        
- 
 } // End of BasePlusCommissionSalesEmployee Class.

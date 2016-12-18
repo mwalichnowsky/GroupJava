@@ -1,3 +1,8 @@
+/*
+* Product Class
+* Specifies the Product Object
+*/
+
 package factory;
 
 /**

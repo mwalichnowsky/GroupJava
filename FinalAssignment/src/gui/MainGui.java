@@ -1,11 +1,10 @@
-package gui;
-
 /**
  * @author Matthew Walichnowsky | 200171919
  * Branden's Db - username gc200315409
  * password- ?8pDT38G
  * url -https://phpmyadmin.dreamhost.com/?hostname=sql.computerstudi.es
  */
+package gui;
 
 import general.Global;
 import humanResources.Employee;
@@ -216,7 +215,6 @@ public class MainGui extends JFrame
             headerPanel.setBorder(BorderFactory.createRaisedBevelBorder());
         } // End of buildHeaderPanel method.
 
-
         /**
          * This creates the employee selection panel.
          * @param labelMessage 
@@ -249,8 +247,7 @@ public class MainGui extends JFrame
             basePlusCommissionEmployee.addItemListener(rbHandler);
             
             return employeeSelectionPanel;
-        }
-
+        }//End of buildEmployeeSelectionPanel
 
         /**
          * This creates the employee panel.
@@ -315,8 +312,7 @@ public class MainGui extends JFrame
             
             greaterEmployeePanel.add(createEmployeePanel, BorderLayout.NORTH);
             greaterEmployeePanel.add(employeeButtonPanel, BorderLayout.SOUTH);
-        }
-
+        }//End of buildCreateEmployeePanel
         
         /**
          * This method builds the human resources search panel.
@@ -341,11 +337,8 @@ public class MainGui extends JFrame
             searchEmployeePanel.add(searchEmpNorthPanel, BorderLayout.NORTH);
             searchEmployeePanel.add(scrollPane, BorderLayout.CENTER);
             searchEmployeePanel.add(searchEmpSouthPanel, BorderLayout.SOUTH);
-        }
+        }//End of buildSearchEmployeePanel
         
-        
-
-
         /**
          * This method builds the create product panel.
          */
@@ -364,47 +357,49 @@ public class MainGui extends JFrame
             areaProductSummary = new JTextArea("Summary / Notes Here");
             
             final String DB_URL = "jdbc:mysql://sql.computerstudi.es:3306/gc200315409";
-         // query string
-        final String QRY = "Select name FROM manufacturer";
-        
-        Connection conn = null;
-        Statement stat = null;
-        ResultSet result = null;
+            // query string
+            final String QRY = "Select name FROM manufacturer";
+
+            Connection conn = null;
+            Statement stat = null;
+            ResultSet result = null;
         
           try
             {
-            conn = DriverManager.getConnection(DB_URL, "gc200315409", "?8pDT38G");
-            stat = conn.createStatement();
-            result = stat.executeQuery(QRY);
-                
-            // getting the food names and putting them in a array.
-            ArrayList<String> itemNames = new ArrayList<String>();
+                conn = DriverManager.getConnection(DB_URL, "gc200315409", "?8pDT38G");
+                stat = conn.createStatement();
+                result = stat.executeQuery(QRY);
 
-            while(result.next())
-            {
-                try
+                // getting the food names and putting them in a array.
+                ArrayList<String> itemNames = new ArrayList<String>();
+
+                while(result.next())
                 {
-                    itemNames.add(result.getString("name" ));
-                    System.out.println(itemNames.toString());
-                } 
-                catch (SQLException e) 
-                {
-                    System.out.println(e);
+                    try
+                    {
+                        itemNames.add(result.getString("name" ));
+                        System.out.println(itemNames.toString());
+                    } 
+                    catch(SQLException e1)
+                    {
+                        g.sqlError(e1, "Error");
+                    }
+
                 }
-
+                // use a loop to store each item
+                for (String string : itemNames) 
+                {
+                    manufacturers.addItem(string);
+                }
             }
-            
-            // use a loop to store each item
-            for (String string : itemNames) 
+            catch(SQLException e1)
             {
-                manufacturers.addItem(string);
-      
+                g.sqlError(e1, "Error");
             }
-    }
-         catch(SQLException e1)
-         {
-             System.out.println(e1);
-         }
+            catch(Exception e1)
+            {
+                g.generalError(e1, "Error");
+            }
 
             g.border(inventoryPanel, "Inventory Information");
             productNorthPanel.add(new JLabel("Name:"));
@@ -428,10 +423,12 @@ public class MainGui extends JFrame
         {
             @Override public void actionPerformed(ActionEvent e) 
             {
-                try {
+                try 
+                {
                     insertProduct();
-                } catch (SQLException e1) {
-                    System.out.println(e1);
+                } catch(SQLException e1)
+                {
+                    g.sqlError(e1, "Error");
                 }
               
             }
@@ -453,14 +450,11 @@ public class MainGui extends JFrame
             manNorthPanel.add(new JLabel("Phone Number:"));
             manNorthPanel.add(textManufacturerPhoneNumber);
             
-             JButton createManufactuerButton = new JButton("Submit");
+            JButton createManufactuerButton = new JButton("Submit");
             createManufactuerButton.addActionListener(new CreateManufactuerButtonListener());
-          
-
             
             // Setup manufacturing panel.
             createManufacturerPanel.setLayout(new BorderLayout());
-            
 
             createManufacturerPanel.add(manNorthPanel, BorderLayout.NORTH);
             createManufacturerPanel.add(createManufactuerButton, BorderLayout.SOUTH);
@@ -471,10 +465,13 @@ public class MainGui extends JFrame
         {
             @Override public void actionPerformed(ActionEvent e) 
             {
-                try {
+                try 
+                {
                     insertManufacturer();
-                } catch (Exception e1) {
-                    System.out.println(e1);
+                } 
+                catch (Exception e1) 
+                {
+                    g.generalError(e1, "Error");
                 }
               
             }
@@ -514,29 +511,28 @@ public class MainGui extends JFrame
             
             // Setup search inventory panel.
             searchInventoryPanel.setLayout(new BorderLayout());
+            
             // if statment to deciede what table to use
-            if(chooseProdocutOrManufacturer ==0)
+            if(chooseProdocutOrManufacturer == 0)
             {
-            searchInventoryPanel.validate();
-            searchInventoryPanel.repaint();
-            JScrollPane scrollPane = new JScrollPane(productSearchTable); 
-            searchInventoryPanel.add(invNorthPanel, BorderLayout.NORTH);
-            searchInventoryPanel.add(scrollPane, BorderLayout.CENTER);
-            searchInventoryPanel.add(searchInventorySouthPanel, BorderLayout.SOUTH);
+                searchInventoryPanel.validate();
+                searchInventoryPanel.repaint();
+                JScrollPane scrollPane = new JScrollPane(productSearchTable); 
+                searchInventoryPanel.add(invNorthPanel, BorderLayout.NORTH);
+                searchInventoryPanel.add(scrollPane, BorderLayout.CENTER);
+                searchInventoryPanel.add(searchInventorySouthPanel, BorderLayout.SOUTH);
             }
             // if statment to deciede what table to use
-            else if(chooseProdocutOrManufacturer ==1)
+            else if(chooseProdocutOrManufacturer == 1)
             {
-            searchInventoryPanel.validate();
-            searchInventoryPanel.repaint();
-            JScrollPane scrollPane = new JScrollPane(manufacturerSearchTable);
-            searchInventoryPanel.add(invNorthPanel, BorderLayout.NORTH);
-            searchInventoryPanel.add(scrollPane, BorderLayout.CENTER);
-            searchInventoryPanel.add(searchInventorySouthPanel, BorderLayout.SOUTH);
+                searchInventoryPanel.validate();
+                searchInventoryPanel.repaint();
+                JScrollPane scrollPane = new JScrollPane(manufacturerSearchTable);
+                searchInventoryPanel.add(invNorthPanel, BorderLayout.NORTH);
+                searchInventoryPanel.add(scrollPane, BorderLayout.CENTER);
+                searchInventoryPanel.add(searchInventorySouthPanel, BorderLayout.SOUTH);
             }
-            
-            
-        }
+        }//End of buildSearchInventoryPanel
         
         private class SearchInventoryButtonListener implements ActionListener
         {
@@ -544,13 +540,12 @@ public class MainGui extends JFrame
             {
                 try
                 {
-                searchProductOrManufacturer();
+                    searchProductOrManufacturer();
                 }
-                catch(Exception e)
+                catch(Exception e1)
                 {
-                    System.out.println(e);
+                    g.generalError(e1, "Error");
                 }
-                    
             }
         } // end of SearchInventoryButtonListener Listener
         
@@ -565,17 +560,13 @@ public class MainGui extends JFrame
                 
                 if(searchProducts.isSelected())
                 {
-                    
                     // a way to determine what to search for
                     chooseProdocutOrManufacturer = 0;
-                    
-                    
                 }
                 // getting the manufactuer table
                 else if(searchManufacturers.isSelected())
                 {
                     chooseProdocutOrManufacturer = 1;
-                    
                 }
             }
         }//end of handler
@@ -614,7 +605,7 @@ public class MainGui extends JFrame
             createSalesPanel.setLayout(new BorderLayout());
             createSalesPanel.add(salesNorthPanel, BorderLayout.NORTH);
             createSalesPanel.add(salesSouthPanel, BorderLayout.SOUTH);
-        }
+        }//End of buildCreateSalesPanel
 
         
         /**
@@ -646,7 +637,7 @@ public class MainGui extends JFrame
             editSalesPanel.setLayout(new BorderLayout());
             editSalesPanel.add(editSalesNorthPanel, BorderLayout.NORTH);
             editSalesPanel.add(editSalesSouthPanel, BorderLayout.SOUTH);
-        }
+        }//End of buildEditSalesPanel
         
         
         /**
@@ -660,7 +651,6 @@ public class MainGui extends JFrame
 
             // Database Connection Here
             JComboBox employees = new JComboBox();
-            //products.setSelectedIndex(0);
             
             g.border(editEmpNorthPanel, "Employee Information");
             editEmpNorthPanel.add(new JLabel("Employee:"));
@@ -677,7 +667,7 @@ public class MainGui extends JFrame
             editEmployeePanel.setLayout(new BorderLayout());
             editEmployeePanel.add(editEmpNorthPanel, BorderLayout.NORTH);
             editEmployeePanel.add(editEmpSouthPanel, BorderLayout.SOUTH);
-        }
+        }//End of buildEditEmployeesPanel
         
         
         /**
@@ -700,7 +690,6 @@ public class MainGui extends JFrame
 
             // Database Connection Here
             JComboBox products = new JComboBox();
-            //products.setSelectedIndex(0);
             
             g.border(editInvCenterPanel, "Inventory Information");
             editInvCenterPanel.add(inventoryLabel);
@@ -722,7 +711,7 @@ public class MainGui extends JFrame
             editInventoryPanel.add(editInvNorthPanel, BorderLayout.NORTH);
             editInventoryPanel.add(editInvCenterPanel, BorderLayout.CENTER);
             editInventoryPanel.add(editInvSouthPanel, BorderLayout.SOUTH);
-        }
+        }//End of buildEditInventoryPanel
         
 
         /**
@@ -735,7 +724,7 @@ public class MainGui extends JFrame
 
             // Add items to the panel.
             footerPanel.add(exitButton);
-        }
+        }//End of buildFooterPanel
     /////////////////////// End of Build Panels ////////////////////////////////
     
     /* --------- Action Listeners ------------------------------------------- */
@@ -748,12 +737,12 @@ public class MainGui extends JFrame
             @Override public void actionPerformed(ActionEvent event)
             {
                 // Add to database.
-                    try 
-                    {
-                     searchEmployee();    
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                try 
+                {
+                    searchEmployee();    
+                } catch (Exception e) {
+                    System.out.print(e);
+                }
             }
         } // End of SearchEmployeeButtonListener inner class.
         private class ExitButtonListener implements ActionListener
@@ -792,15 +781,13 @@ public class MainGui extends JFrame
                 )
                 {
                     
-                // Add to database.
+                    // Add to database.
                     try 
                     {
-                    insertEmployee();    
+                        insertEmployee();    
                     } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                    
-                    
+                        System.out.print(e);
+                    } 
                 }
             }
         } // End of SubmitButtonListener inner class.
@@ -845,8 +832,13 @@ public class MainGui extends JFrame
                     JOptionPane.OK_CANCEL_OPTION)==JOptionPane.OK_OPTION
                 )
                 {
-                    //add to database
-                    insertSales();
+                    try
+                    {
+                        //add to database
+                        insertSales();
+                    } catch (Exception e) {
+                        System.out.print(e);
+                    } 
                 }
             }
         } // End of CreateButtonListener inner class.
@@ -965,16 +957,11 @@ public class MainGui extends JFrame
                 if(productButton.isSelected())
                 {
                     inventoryLabel.setText("Products");
-                    
-                    
-                    
-                    
                 }
                 // getting the manufactuer table
                 else if(manufacturerButton.isSelected())
                 {
                     inventoryLabel.setText("Manufacturers");
-                   
                 }
             }
         }//end of handler
@@ -1025,52 +1012,90 @@ public class MainGui extends JFrame
             data.add(rowData);
         }
         return new DefaultTableModel(data,colNames);
-        
-    }
+    }//End of buildTableModel
 
     
     public void buildTables()
     {
         
-         final String DB_URL = "jdbc:mysql://sql.computerstudi.es:3306/gc200315409";
+        final String DB_URL = "jdbc:mysql://sql.computerstudi.es:3306/gc200315409";
         String userName = "gc200315409";
         String password = "?8pDT38G";
-        
-        try 
+
+        try
         {
             conn = DriverManager.getConnection(DB_URL, userName,password);
-        } catch (Exception e) {
         }
-
-        // Employee Search Table.
-        try
+        catch(SQLException e)
         {
-            final String QRY = "Select * FROM Employee";
-            stat = conn.createStatement();
-            rs = stat.executeQuery(QRY);
-            employeeSearchTable.setModel(buildTableModel(rs));
+            g.sqlError(e, "Error"); 
         }
-        catch ( SQLException error ) { g.sqlError(error, "Error"); }
-           
-        // Product Search Table.
-        try
+        catch(Exception e1)
         {
-            final String QRY = "Select * FROM Products";
-            stat = conn.createStatement();
-            rs = stat.executeQuery(QRY);
-            productSearchTable.setModel(buildTableModel(rs));
+            g.generalError(e1, "Error");
         }
-        catch ( SQLException error ) { g.sqlError(error, "Error"); }
         
-        // Manufacturer Search Table.
-        try
+        //Recently Added by Ross to ensure integrity. Remove
+        //If errors arise.
+        if(conn != null)
         {
-            final String QRY = "Select * FROM Manufacturer";
-            stat = conn.createStatement();
-            rs = stat.executeQuery(QRY);
-            manufacturerSearchTable.setModel(buildTableModel(rs));
+            // Employee Search Table.
+            try
+            {
+                final String QRY = "Select * FROM Employee";
+
+                stat = conn.createStatement();
+                rs = stat.executeQuery(QRY);
+
+                employeeSearchTable.setModel(buildTableModel(rs));
+            }
+            catch (SQLException error) 
+            { 
+                g.sqlError(error, "Error"); 
+            }
+            catch(Exception e1)
+            {
+                g.generalError(e1, "Error");
+            }
+
+            // Product Search Table.
+            try
+            {
+                final String QRY = "Select * FROM Products";
+
+                stat = conn.createStatement();
+                rs = stat.executeQuery(QRY);
+
+                productSearchTable.setModel(buildTableModel(rs));
+            }
+            catch (SQLException error) 
+            {
+                g.sqlError(error, "Error"); 
+            }
+            catch(Exception e1)
+            {
+                g.generalError(e1, "Error");
+            }
+
+            // Manufacturer Search Table.
+            try
+            {
+                final String QRY = "Select * FROM Manufacturer";
+
+                stat = conn.createStatement();
+                rs = stat.executeQuery(QRY);
+
+                manufacturerSearchTable.setModel(buildTableModel(rs));
+            }
+            catch (SQLException error) 
+            { 
+                g.sqlError(error, "Error"); 
+            }
+            catch(Exception e1)
+            {
+                g.generalError(e1, "Error");
+            }
         }
-        catch ( SQLException error ) { g.sqlError(error, "Error"); }
     }
     
     // inserting employee data into the database
@@ -1081,26 +1106,46 @@ public class MainGui extends JFrame
         String password = "?8pDT38G";
         
         final String DB_URL = "jdbc:mysql://sql.computerstudi.es:3306/gc200315409";
-        conn = DriverManager.getConnection(DB_URL, userName,password);
 
-        // adding a employee to the database
-        try {
-              stat = conn.createStatement();
-              String SQL = "INSERT INTO employee"
-                + " (`firstname`, `lastname`, `gender`, `age`, `address`, `dateofbirth`, `phonenumber`, `sin`, `datehired`, `position`, "
-                + "`status`, `hourlyrate`, `commissionrate`, `salaryrate`, `department`)"
-                + "VALUES ('"+textFirstName.getText()+"', '"+ textLastName.getText()+"', '"+ textGender.getText()+ "', '" 
-                + textAge.getText()+"', '"+textAddress.getText()+"', '"+textDateOfBirth.getText() +"', '"+ textPhoneNumber.getText()+"', '"
-                + textSIN.getText()+ "', '"+ textDateHired.getText()+ "', '"+ textPosition.getText() + "', '"+ textStatus.getText()+"', '" 
-                + textHourlyRate.getText()+"', '"+ textCommissionRate.getText()+ "', '"+ textSalary.getText()+"', '"+textDepartment.getText()+ "');";
-          
-              System.out.println(SQL);
-        stat.executeUpdate(SQL);
-        } catch (Exception e) { 
-            System.out.println(e);
+        try
+        {
+            conn = DriverManager.getConnection(DB_URL, userName,password);
         }
-       
-    }
+        catch(SQLException e)
+        {
+            g.sqlError(e, "Error"); 
+        }
+        catch(Exception e1)
+        {
+            g.generalError(e1, "Error");
+        }
+        
+        if(conn != null)
+        {
+            // adding a employee to the database
+            try 
+            {
+                  stat = conn.createStatement();
+                  String SQL = "INSERT INTO employee"
+                    + " (`firstname`, `lastname`, `gender`, `age`, `address`, `dateofbirth`, `phonenumber`, `sin`, `datehired`, `position`, "
+                    + "`status`, `hourlyrate`, `commissionrate`, `salaryrate`, `department`)"
+                    + "VALUES ('"+textFirstName.getText()+"', '"+ textLastName.getText()+"', '"+ textGender.getText()+ "', '" 
+                    + textAge.getText()+"', '"+textAddress.getText()+"', '"+textDateOfBirth.getText() +"', '"+ textPhoneNumber.getText()+"', '"
+                    + textSIN.getText()+ "', '"+ textDateHired.getText()+ "', '"+ textPosition.getText() + "', '"+ textStatus.getText()+"', '" 
+                    + textHourlyRate.getText()+"', '"+ textCommissionRate.getText()+ "', '"+ textSalary.getText()+"', '"+textDepartment.getText()+ "');";
+
+                stat.executeUpdate(SQL);
+            }
+            catch(SQLException e)
+            {
+                g.sqlError(e, "Error"); 
+            }
+            catch(Exception e1)
+            {
+                g.generalError(e1, "Error");
+            }
+        }
+    }//End of insertEmployee
     
     
     // search for a Employee
@@ -1112,7 +1157,7 @@ public class MainGui extends JFrame
 
             final String DB_URL = "jdbc:mysql://sql.computerstudi.es:3306/gc200315409";
             
-            String test = textSearchEmployees.getText().toString();
+            String test = textSearchEmployees.getText();
             final String QRY = "SELECT * FROM employee WHERE firstname LIKE '%"+test+"%';";
             
             // reseting the sql variables
@@ -1135,57 +1180,60 @@ public class MainGui extends JFrame
                     //Print one row          
                     for(int i = 1 ; i <= columnsNumber; i++)
                     {
-
-                    System.out.print(result.getString(i) + " "); //Print one element of a row
-                    employeeSearchTable.setModel(buildTableModel(result)); //Print one element of a row
-                     System.out.println(QRY);
+                        //System.out.print(result.getString(i) + " "); //Print one element of a row
+                        employeeSearchTable.setModel(buildTableModel(result)); //Print one element of a row
+                        //System.out.println(QRY);
                     }          
                 }
                 result.close();
                 stat.close();
                 conn.close();
             }
-            catch(SQLException error)
+            catch(SQLException e)
             {
-                System.out.println(error);
+                g.sqlError(e, "Error"); 
             }
  
-        }catch (NullPointerException e1) {
-            System.out.println(e1);
-        } 
-        catch (Exception e) {
-            System.out.println(e);
+        }
+        catch (NullPointerException e2) 
+        {
+            g.generalError(e2, "NullPointerException Error");
+        }
+        catch(Exception e1)
+        {
+            g.generalError(e1, "Error");
         }
     }
     
     // method to insert a product
     public void insertProduct()
             throws SQLException
-    { String userName = "gc200315409";
+    { 
+        String userName = "gc200315409";
         String password = "?8pDT38G";
         
         final String DB_URL = "jdbc:mysql://sql.computerstudi.es:3306/gc200315409";
         conn = DriverManager.getConnection(DB_URL, userName,password);
 
         try {
-            String value=manufacturers.getSelectedItem().toString();
+            String value = manufacturers.getSelectedItem().toString();
             stat = conn.createStatement();
+            
             String SQL = "INSERT INTO products"
                 + " (`name`, `code`, `price`, `manufacturer`)"
                 + "VALUES ('"+textProductName.getText()+"', '"+ textProductCode.getText()+"', '"+ textProductPrice.getText()+"', '"+value+  "');";
                 
-            
-            System.out.println("hi");
-              System.out.println(SQL);
-        stat.executeUpdate(SQL);
-        } catch (SQLException e) {
-            System.out.println(e);
+            //System.out.println(SQL);
+            stat.executeUpdate(SQL);
+        }
+        catch(SQLException e)
+        {
+            g.sqlError(e, "Error"); 
         }
         catch(Exception e1)
         {
-            System.out.println(e1);
+            g.generalError(e1, "Error");
         }
-   
     }
     
     // A method to insert a new manufactuer
@@ -1204,14 +1252,17 @@ public class MainGui extends JFrame
                 + " (`name`, `location`, `phonenumber`)"
                 + "VALUES ('"+textManufacturerName.getText()+"', '"+ textManufacturerLocation.getText()+"', '"+ textManufacturerPhoneNumber.getText()+"');";
 
-        System.out.println(SQL);
+        //System.out.println(SQL);
+        
         stat.executeUpdate(SQL);
-        } catch (SQLException e) {
-            System.out.println(e);
+        
+        } catch(SQLException e)
+        {
+            g.sqlError(e, "Error"); 
         }
         catch(Exception e1)
         {
-            System.out.println(e1);
+            g.generalError(e1, "Error");
         }
     }
     
@@ -1225,7 +1276,7 @@ public class MainGui extends JFrame
         final String DB_URL = "jdbc:mysql://sql.computerstudi.es:3306/gc200315409";
                  
 
-        String test = textSearchInventory.getText().toString();
+        String test = textSearchInventory.getText();
             
             // to get the user input for a Product
             if(chooseProdocutOrManufacturer == 0)
@@ -1237,85 +1288,82 @@ public class MainGui extends JFrame
                 Statement stat = null;
                 ResultSet result = null;
             
-            try
-            {
-                conn = DriverManager.getConnection(DB_URL, userName, password);
-                stat = conn.createStatement();
-                
-                result = stat.executeQuery(QRY);
-                ResultSetMetaData rsmd = result.getMetaData();
-                // gettinf the data to display in a table 
-                int columnsNumber = rsmd.getColumnCount();
-                while (result.next()) {
-                //Print one row          
-                for(int i = 1 ; i <= columnsNumber; i++){
+                try
+                {
+                    conn = DriverManager.getConnection(DB_URL, userName, password);
+                    stat = conn.createStatement();
 
-                  System.out.print(result.getString(i) + " "); //Print one element of a row
-                   productSearchTable.setModel(buildTableModel(result)); //Print one element of a row
-                    System.out.println(QRY);
+                    result = stat.executeQuery(QRY);
+                    ResultSetMetaData rsmd = result.getMetaData();
+                    // gettinf the data to display in a table 
+                    int columnsNumber = rsmd.getColumnCount();
+                    while (result.next()) {
+                    //Print one row          
+                        for(int i = 1 ; i <= columnsNumber; i++){
 
-                 }             
+                            //System.out.print(result.getString(i) + " "); //Print one element of a row
+                            productSearchTable.setModel(buildTableModel(result)); //Print one element of a row
+                            //System.out.println(QRY);
 
-             }
+                        }//End of forloop        
+                    }//End of While
 
-            }
-            catch(SQLException error)
-            {
-                System.out.println(error);
-            }
-            catch (NullPointerException e1) 
-            {
-                 System.out.println(e1);
-             } 
-             catch (Exception e) 
-             {
-                 System.out.println(e);
-             }
-          }
+                }//Begin catch
+                catch(SQLException e)
+                {
+                    g.sqlError(e, "Error"); 
+                }
+                catch(NullPointerException e2)
+                {
+                    g.generalError(e2, "Error");
+                }
+                catch(Exception e1)
+                {
+                    g.generalError(e1, "Error");
+                }
+            }//End of if(chooseProdocutOrManufacturer == 0)
+            
             // to select a manufactuer
             else if( chooseProdocutOrManufacturer == 1)
             {
                 // select statement to get user inupt for a manufactuer
                 final String QRY = "SELECT * FROM manufacturer WHERE name LIKE '%"+test+"%';";
             
-            Connection conn = null;
-            Statement stat = null;
-            ResultSet result = null;
+                Connection conn = null;
+                Statement stat = null;
+                ResultSet result = null;
             
-            try
-            {
-                conn = DriverManager.getConnection(DB_URL, userName, password);
-                stat = conn.createStatement();
-                
-                result = stat.executeQuery(QRY);
-                ResultSetMetaData rsmd = result.getMetaData();
+                try
+                {
+                    conn = DriverManager.getConnection(DB_URL, userName, password);
+                    stat = conn.createStatement();
 
-                int columnsNumber = rsmd.getColumnCount();
-                while (result.next()) {
-                //Print one row          
-                for(int i = 1 ; i <= columnsNumber; i++){
+                    result = stat.executeQuery(QRY);
+                    ResultSetMetaData rsmd = result.getMetaData();
 
-                  System.out.print(result.getString(i) + " "); //Print one element of a row
-                  manufacturerSearchTable.setModel(buildTableModel(result)); //Print one element of a row
-                    System.out.println(QRY);
+                    int columnsNumber = rsmd.getColumnCount();
+                    while (result.next()) {
+                        //Print one row          
+                        for(int i = 1 ; i <= columnsNumber; i++){
+                            //System.out.print(result.getString(i) + " "); //Print one element of a row
+                            manufacturerSearchTable.setModel(buildTableModel(result)); //Print one element of a row
+                            //System.out.println(QRY);
 
-                 }             
-
-             }
-
-            }
-            catch(SQLException error)
-            {
-                System.out.println(error);
-            }
-            catch (NullPointerException e1) 
-            {
-                 System.out.println(e1);
-             } 
-             catch (Exception e) 
-             {
-                 System.out.println(e);
-             }
+                        }//End of forloop           
+                    }//End of whileloop
+                }
+                catch(SQLException e)
+                {
+                    g.sqlError(e, "Error"); 
+                }
+                catch(NullPointerException e2)
+                {
+                    g.generalError(e2, "Error");
+                }
+                catch(Exception e1)
+                {
+                    g.generalError(e1, "Error");
+                }
             }
     }
     
@@ -1330,21 +1378,30 @@ public class MainGui extends JFrame
 
         try {
             conn = DriverManager.getConnection(DB_URL, userName,password);
+            
             stat = conn.createStatement();
+            
             String SQL = "INSERT INTO sales"
                 + " (`quantity`, `product`, `employee`)"
-                + "VALUES ('"+textSalesQuantity.getText()+"', '"+ textManufacturerLocation.getText()+"', '"+ textManufacturerPhoneNumber.getText()+"');";
-        stat.executeUpdate(SQL);
+                + "VALUES ('"+textSalesQuantity.getText()+"', '"
+                + textManufacturerLocation.getText()+"', '"+ textManufacturerPhoneNumber.getText()+"');";
+            
+            stat.executeUpdate(SQL);
         
-        } catch (SQLException e) {
-            System.out.println(e);
-        }
-        catch(Exception e1)
+        } 
+        catch(SQLException e)
         {
-            System.out.println(e1);
+            g.sqlError(e, "Error"); 
         }
-        
-    }
+        catch(NullPointerException e2)
+        {
+            g.generalError(e2, "Error");
+        }
+            catch(Exception e1)
+        {
+            g.generalError(e1, "Error");
+        }
+    }//End of insertSales
     
     public void setupTabs()
     {
@@ -1376,6 +1433,5 @@ public class MainGui extends JFrame
         mainTabPane.addTab("HR", null , hrTabPane, "HR");
         mainTabPane.addTab("Inventory", null, inventoryTabPane, "Inventory");
         mainTabPane.addTab("Sales", null, salesTabPane, "Sales");
-    }
-    
+    }//End of setupTabs
 } // End of UserGui class.

@@ -1,3 +1,7 @@
+/*
+* Login GUI Class
+*
+*/
 package gui;
 
 import general.Global;
@@ -81,7 +85,7 @@ String
             loginPassword = textPassword.getPassword().toString();
             
             System.out.println(loginUser + loginPassword);
-            
+            //****************FIX*****************************
             // Try to to connect.
             /*try
             {
