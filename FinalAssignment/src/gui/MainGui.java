@@ -216,6 +216,7 @@ public class MainGui extends JFrame
             headerPanel.setBorder(BorderFactory.createRaisedBevelBorder());
         } // End of buildHeaderPanel method.
 
+        
         /**
          * This creates the employee selection panel.
          * @param labelMessage 
@@ -250,6 +251,7 @@ public class MainGui extends JFrame
             return employeeSelectionPanel;
         }//End of buildEmployeeSelectionPanel
 
+        
         /**
          * This creates the employee panel.
          */
@@ -315,6 +317,7 @@ public class MainGui extends JFrame
             greaterEmployeePanel.add(employeeButtonPanel, BorderLayout.SOUTH);
         }//End of buildCreateEmployeePanel
         
+        
         /**
          * This method builds the human resources search panel.
          */
@@ -339,6 +342,7 @@ public class MainGui extends JFrame
             searchEmployeePanel.add(scrollPane, BorderLayout.CENTER);
             searchEmployeePanel.add(searchEmpSouthPanel, BorderLayout.SOUTH);
         }//End of buildSearchEmployeePanel
+        
         
         /**
          * This method builds the create product panel.
@@ -419,7 +423,7 @@ public class MainGui extends JFrame
             greaterProductPanel.add(createProductPanel, BorderLayout.CENTER);
             greaterProductPanel.add(productSouthPanel, BorderLayout.SOUTH);
         }
-        
+
 
         /**
          * This method builds the create manufacturer panel.
@@ -444,7 +448,6 @@ public class MainGui extends JFrame
 
             createManufacturerPanel.add(manNorthPanel, BorderLayout.NORTH);
             createManufacturerPanel.add(createManufactuerButton, BorderLayout.SOUTH);
-
         }
         
 
@@ -504,7 +507,6 @@ public class MainGui extends JFrame
             }
         }//End of buildSearchInventoryPanel
         
-
 
         /**
          * This method creates the sales panels used for creating new orders.
@@ -967,6 +969,7 @@ public class MainGui extends JFrame
             }
         } // end of SearchInventoryButtonListener Listener
         
+        
         private class SearchRadioButtonHandler implements ItemListener
         {
             @Override
@@ -1106,7 +1109,6 @@ public class MainGui extends JFrame
         }
     }
     
-    
     // inserting employee data into the database
     public  void insertEmployee()
             throws SQLException
@@ -1154,7 +1156,7 @@ public class MainGui extends JFrame
                     + "', '" + textCommissionRate.getText() + "', '" 
                     + textSalary.getText() + "', '" + textDepartment.getText()
                     + "');";
-
+                
                 stat.executeUpdate(SQL);
             }
             catch(SQLException e)
@@ -1172,7 +1174,8 @@ public class MainGui extends JFrame
     // search for a Employee
     public void searchEmployee()
     {
-        try {
+        try 
+        {
             String userName = "gc200315409";
             String password = "?8pDT38G";
 
@@ -1242,6 +1245,7 @@ public class MainGui extends JFrame
 
         try {
             String value = manufacturers.getSelectedItem().toString();
+            
             stat = conn.createStatement();
             
             String SQL = "INSERT INTO products"
@@ -1274,15 +1278,19 @@ public class MainGui extends JFrame
         try {
             conn = DriverManager.getConnection(DB_URL, userName,password);
             stat = conn.createStatement();
-            String SQL = "INSERT INTO manufacturer"
-                + " (`name`, `location`, `phonenumber`)"
-                + "VALUES ('"+textManufacturerName.getText()+"', '"+ textManufacturerLocation.getText()+"', '"+ textManufacturerPhoneNumber.getText()+"');";
 
-        //System.out.println(SQL);
-        
-        stat.executeUpdate(SQL);
-        
-        } catch(SQLException e)
+            stat = conn.createStatement();
+            
+            String SQL = "INSERT INTO products"
+                + " (`name`, `code`, `price`, `manufacturer`)"
+                + "VALUES ('" + textProductName.getText() + "', '"
+                + textProductCode.getText() + "', '" 
+                + textProductPrice.getText() + "', '" + value + "');";
+                
+            //System.out.println(SQL);
+            stat.executeUpdate(SQL);
+        }
+        catch(SQLException e)
         {
             g.sqlError(e, "Error"); 
         }
@@ -1430,7 +1438,7 @@ public class MainGui extends JFrame
             g.generalError(e1, "Error");
         }
     }//End of insertSales
-    
+
     
     public void setupTabs()
     {
@@ -1463,5 +1471,5 @@ public class MainGui extends JFrame
         mainTabPane.addTab("Inventory", null, inventoryTabPane, "Inventory");
         mainTabPane.addTab("Sales", null, salesTabPane, "Sales");
     }//End of setupTabs
-    
+
 } // End of MainGui class.

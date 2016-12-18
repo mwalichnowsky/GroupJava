@@ -94,8 +94,9 @@ public class LoginGui extends JFrame
             );
             
             loginUser = textUsername.getText();
+
             loginPassword = new String(textPassword.getPassword());
-            
+           
             // Try to to connect.
             try
             {
@@ -172,6 +173,7 @@ public class LoginGui extends JFrame
                 }
             }
             // General Error.
+
             catch (Exception error)
             {
                 g.generalError(error, "General Error"); 
@@ -192,6 +194,7 @@ public class LoginGui extends JFrame
                     );
                 }
             }
+
 
         } // End of do statement.
         while

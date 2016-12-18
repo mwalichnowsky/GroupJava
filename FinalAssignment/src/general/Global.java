@@ -86,7 +86,7 @@ public class Global
                 + error.getMessage()
                 + "\n*******************************************************");
         }
-        catch(IOException ioe)
+        catch(IOException oe)
         {
             System.err.println("Fatal System Error! ");
         }
@@ -96,6 +96,7 @@ public class Global
         JOptionPane.showMessageDialog
                               (null, errorString + "\n\n" + error.getMessage());
     }//End of sqlError
+    
     
     /**
      *
@@ -110,11 +111,11 @@ public class Global
         try
         {
             io.appendToFile(
-                "******************************************************"
-                + "\n"+ LocalDateTime.now()
-                + "\nError description: \n"
-                + error.getMessage()
-                + "\n*******************************************************");
+                    "******************************************************"
+                    + "\n"+ LocalDateTime.now()
+                    + "\nError description: \n"
+                    + error.getMessage()
+                    + "\n*******************************************************");
         }
         catch(IOException ioe)
         {
