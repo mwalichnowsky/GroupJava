@@ -41,7 +41,7 @@ public class HourlyEmployee extends Employee
             super
             (
                 firstName, lastName, gender, address, dateOfBirth, phoneNumber, 
-                sin, employeeNumber, dateHired, position, status, department
+                sin, dateHired, position, status, department
             );
             setHourlyRate(hourlyRate);
         }

@@ -1,3 +1,7 @@
+/*
+* Main Class
+*
+*/
 package general;
 
 import gui.LoginGui;
@@ -14,10 +18,5 @@ public class Main
     public static void main(String[] args) 
     {
         LoginGui loginGui = new LoginGui();
-        
-        
-        
-        
     } // End of main method.
-    
 } // End of Main class.

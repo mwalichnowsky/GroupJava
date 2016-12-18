@@ -1,7 +1,11 @@
+/*
+* Login GUI Class
+*
+*/
 package gui;
 
 import general.Global;
-import java.beans.Statement;
+import java.sql.Statement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -20,12 +24,17 @@ public class LoginGui extends JFrame
 {
     /* ----------------------- Variables ------------------------------------ */
         private String 
-            loginUser, loginPassword,  
-            databaseUser = "GroupJava", 
-            databasePassword = "h^dHd(j6^hmD#(mfjgSK;fkss"
+            loginUser, loginPassword
         ;
         
+        boolean isAdmin;
+        
         Global g = new Global();
+        
+        // Database connection objects.
+        Statement stat = null;
+        ResultSet rs = null;
+        Connection connection = null;
     /////////////////////// End of Variables ///////////////////////////////////
     
         
@@ -36,16 +45,13 @@ public class LoginGui extends JFrame
     {
         // Items to hold selected data.
         JPanel loginPanel = new JPanel();
-       
-        // Database connection objects.
-        Statement stat = null;
-        ResultSet rs = null;
-        Connection conn = null;
-        
-        final String DB_URL = "jdbc:mysql://72.139.8.122:3306/GroupJava";
-String
-        databaseUser = "GroupJava", 
-            databasePassword = "h^dHd(j6^hmD#(mfjgSK;fkss";
+
+        final String DB_URL 
+                  = "jdbc:mysql://sql.computerstudi.es:3306/gc200315409";
+        String
+            databaseUser = "gc200315409", 
+            databasePassword = "?8pDT38G"
+        ;
                     
         final JTextField textUsername = new JTextField(15);
         final JPasswordField textPassword = new JPasswordField(15);
@@ -78,21 +84,60 @@ String
             );
             
             loginUser = textUsername.getText();
-            loginPassword = textPassword.getPassword().toString();
-            
-            System.out.println(loginUser + loginPassword);
+            loginPassword = new String(textPassword.getPassword());
             
             // Try to to connect.
             try
             {
-                conn = DriverManager.getConnection
+                connection = DriverManager.getConnection
                 (
                     DB_URL, databaseUser, databasePassword
                 );
 
-                // Check Credidentials in the database.
-                databaseCredidentialCheck = true;
-            }
+                if (connection != null)
+                {
+                    String 
+                        sql = "SELECT * FROM users "
+                            + "WHERE username = '"+loginUser+"' ",
+                        rsUser = "", rsPassword = ""
+                    ;
+                    int rsId = 0;
+
+                    stat = connection.createStatement();
+
+                    ResultSet result = stat.executeQuery(sql);
+
+                    while (result.next())
+                    {
+                        rsId = result.getInt("user_id");
+                        rsUser = result.getString("username");
+                        rsPassword = result.getString("password");
+                        isAdmin = result.getBoolean("isAdmin");
+                    }
+                    
+                    System.out.println("read: " + loginUser + loginPassword);
+                    
+                    System.out.println("readRS: " + rsId + rsUser + rsPassword
+                    + isAdmin);
+                    
+                    if (loginUser.equals(rsUser))
+                    {
+                        if (loginPassword.equals(rsPassword))
+                        {
+                            // Check Credidentials in the database.
+                            databaseCredidentialCheck = true;
+                        }
+                        else
+                        {
+                            System.out.println("Error, wrong password.");
+                        }
+                    }
+                    else
+                    {
+                        System.out.println("Error, wrong username.");
+                    }
+                }
+            } // End of try.
 
             // Invalid Login.
             catch (SQLException error)
@@ -117,23 +162,38 @@ String
                 }
             }
             // General Error.
-            catch (Exception error){ g.generalError(error, "General Error"); }
+            catch (Exception error)
+            {
+                g.generalError(error, "General Error"); 
+                
+                databaseCredidentialCheck = false;
+
+                databaseLoopCounter++;
+
+                // Spam prevention.
+                if (databaseLoopCounter > 2)
+                {
+                    // Sleeping thread (15 seconds).
+                    JOptionPane.showMessageDialog
+                    (
+                        null, 
+                        "Failure to authenticate to database. Too many attempts"
+                        + "System will now exit."
+                    );
+                }
+            }
 
         } // End of do statement.
         while
         (
-            databaseCredidentialCheck = false && 
+            databaseCredidentialCheck == false && 
             databaseLoopCounter < 3
         );
-
-        if (conn != null)
+        
+        if (databaseCredidentialCheck == true)
         {
-            boolean isAdmin = false; // Database 
             runGui(isAdmin);
         }
-        
-        boolean isAdmin = true; // Database 
-            runGui(isAdmin);
     }
     /* ----------------------- Methods -------------------------------------- */
         /**

@@ -1,25 +1,34 @@
-package gui;
-
 /**
  * @author Matthew Walichnowsky | 200171919
+ * Branden's Db - username gc200315409
+ * password- ?8pDT38G
+ * url -https://phpmyadmin.dreamhost.com/?hostname=sql.computerstudi.es
  */
+package gui;
 
 import general.Global;
+import humanResources.Employee;
+import humanResources.SalaryEmployee;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.beans.Statement;
-import java.sql.Connection;
+import java.sql.*;
+
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.HashSet;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.Vector;
 import javax.swing.table.DefaultTableModel;
         
 public class MainGui extends JFrame
 {
     /* ----------------------- Variables------------------------------------- */
+    
+         private JComboBox manufacturers = new JComboBox();
+         
         final private JTextField 
                 
             /* Create Employee Personal Info Fields */
@@ -81,6 +90,7 @@ public class MainGui extends JFrame
             createEmployeePanel = new JPanel(),
             searchEmployeePanel = new JPanel(),
             editEmployeePanel = new JPanel(),
+            greaterEmployeePanel = new JPanel(),
             
             /* Inventory Panels */    
             inventoryPanel = new JPanel(),
@@ -88,6 +98,7 @@ public class MainGui extends JFrame
             editInventoryPanel = new JPanel(),
             createProductPanel  = new JPanel(), 
             createManufacturerPanel = new JPanel(), 
+            greaterProductPanel = new JPanel(),
             
             /* Sales Panels */
             createSalesPanel = new JPanel(), searchSalesPanel = new JPanel(),
@@ -127,7 +138,9 @@ public class MainGui extends JFrame
                 
             /* Inventory Radio Buttons */    
             productButton = new JRadioButton("Products:", true),
-            manufacturerButton = new JRadioButton("Manufacturers:")
+            manufacturerButton = new JRadioButton("Manufacturers:"),
+            searchProducts = new JRadioButton("Search Products", true),
+            searchManufacturers = new JRadioButton("Search Manufacturer", false)
         ;
         
         JLabel inventoryLabel = new JLabel("Products:");
@@ -136,10 +149,13 @@ public class MainGui extends JFrame
         Statement stat = null;
         ResultSet rs = null;
               
+        ArrayList<Employee> myEmployees = new ArrayList(); // store all the employees in here 
         // Set variable for calling our global methods.
         Global g = new Global();
         
         boolean isAdmin;
+        private int chooseEmployeeType;
+        private int chooseProdocutOrManufacturer;
         
        
         
@@ -151,6 +167,7 @@ public class MainGui extends JFrame
         {
             super("Prestige Worldwide");
             this.isAdmin = isAdmin;
+            System.out.println(isAdmin);
             setLayout(new BorderLayout());
             
             textCommissionRate.setEditable(false);
@@ -166,7 +183,7 @@ public class MainGui extends JFrame
             buildCreateSalesPanel();
             buildFooterPanel();
             
-            if (isAdmin == true)
+            if (isAdmin)
             {
                 buildEditEmployeesPanel();
                 buildEditInventoryPanel();
@@ -198,7 +215,6 @@ public class MainGui extends JFrame
             headerPanel.add(labelGreeting);
             headerPanel.setBorder(BorderFactory.createRaisedBevelBorder());
         } // End of buildHeaderPanel method.
-
 
         /**
          * This creates the employee selection panel.
@@ -232,8 +248,7 @@ public class MainGui extends JFrame
             basePlusCommissionEmployee.addItemListener(rbHandler);
             
             return employeeSelectionPanel;
-        }
-
+        }//End of buildEmployeeSelectionPanel
 
         /**
          * This creates the employee panel.
@@ -284,14 +299,21 @@ public class MainGui extends JFrame
             
             JPanel employeeSelectionPanel = buildEmployeeSelectionPanel(); 
             
+            greaterEmployeePanel.setLayout(new BorderLayout());
+            
+            JPanel employeeButtonPanel = new JPanel();
+            JButton submitEmployeeButton = new JButton("Submit");
+            submitEmployeeButton.addActionListener(new SubmitEmployeeButtonListener());
+            employeeButtonPanel.add(submitEmployeeButton);
+            
             createEmployeePanel.setLayout(new BorderLayout());
             createEmployeePanel.add(employeeSelectionPanel, BorderLayout.NORTH);
-            createEmployeePanel.add
-                             (employeePersonalInformation, BorderLayout.CENTER);
-            createEmployeePanel.add
-                                  (employeeWorkInformation, BorderLayout.SOUTH);
-        }
-
+            createEmployeePanel.add(employeePersonalInformation, BorderLayout.CENTER);
+            createEmployeePanel.add(employeeWorkInformation, BorderLayout.SOUTH);
+            
+            greaterEmployeePanel.add(createEmployeePanel, BorderLayout.NORTH);
+            greaterEmployeePanel.add(employeeButtonPanel, BorderLayout.SOUTH);
+        }//End of buildCreateEmployeePanel
         
         /**
          * This method builds the human resources search panel.
@@ -301,29 +323,84 @@ public class MainGui extends JFrame
             JPanel searchEmpNorthPanel = new JPanel();
             searchEmpNorthPanel.setLayout(new FlowLayout());
             g.border(searchEmployeePanel, "Search Employees:");
+            
+            JButton searchEmployeeButton = new JButton("Search");
+            searchEmployeeButton.addActionListener(new SearchEmployeeButtonListener());
+            
+            JPanel searchEmpSouthPanel = new JPanel();
+            searchEmpSouthPanel.add(searchEmployeeButton);
+            
             searchEmpNorthPanel.add(new JLabel("Search Employees:"));
             searchEmpNorthPanel.add(textSearchEmployees);          
             areaSearchResults.setEditable(false);
             searchEmployeePanel.setLayout(new BorderLayout());
-            JScrollPane scrollPane = new JScrollPane(areaSearchResults);
+            JScrollPane scrollPane = new JScrollPane(employeeSearchTable);
             searchEmployeePanel.add(searchEmpNorthPanel, BorderLayout.NORTH);
             searchEmployeePanel.add(scrollPane, BorderLayout.CENTER);
-        }
-
-
+            searchEmployeePanel.add(searchEmpSouthPanel, BorderLayout.SOUTH);
+        }//End of buildSearchEmployeePanel
+        
         /**
          * This method builds the create product panel.
          */
         private void buildCreateProductPanel()
         {
             JPanel productNorthPanel = new JPanel();
-            productNorthPanel.setLayout(new GridLayout(3,2));
+            productNorthPanel.setLayout(new GridLayout(2,4));
+            
+            greaterProductPanel.setLayout(new BorderLayout());
+            JButton searchProductButton = new JButton("Submit");
+            searchProductButton.addActionListener(new SearchProductButtonListener());
+            
+            JPanel productSouthPanel = new JPanel();
+            productSouthPanel.add(searchProductButton);
             
             areaProductSummary = new JTextArea("Summary / Notes Here");
             
-            // Database Connection Here
-            JComboBox manufacturers = new JComboBox();
-            //manufacturers.setSelectedIndex(0);
+            final String DB_URL = "jdbc:mysql://sql.computerstudi.es:3306/gc200315409";
+            // query string
+            final String QRY = "Select name FROM manufacturer";
+
+            Connection conn = null;
+            Statement stat = null;
+            ResultSet result = null;
+        
+          try
+            {
+                conn = DriverManager.getConnection(DB_URL, "gc200315409", "?8pDT38G");
+                stat = conn.createStatement();
+                result = stat.executeQuery(QRY);
+
+                // getting the food names and putting them in a array.
+                ArrayList<String> itemNames = new ArrayList<String>();
+
+                while(result.next())
+                {
+                    try
+                    {
+                        itemNames.add(result.getString("name" ));
+                        System.out.println(itemNames.toString());
+                    } 
+                    catch(SQLException e1)
+                    {
+                        g.sqlError(e1, "Error");
+                    }
+
+                }
+                // use a loop to store each item
+                for (String string : itemNames) 
+                {
+                    manufacturers.addItem(string);
+                }
+            }
+            catch(SQLException e1)
+            {
+                g.sqlError(e1, "Error");
+            }
+            catch(Exception e1)
+            {
+                g.generalError(e1, "Error");
+            }
 
             g.border(inventoryPanel, "Inventory Information");
             productNorthPanel.add(new JLabel("Name:"));
@@ -334,16 +411,15 @@ public class MainGui extends JFrame
             productNorthPanel.add(textProductPrice);
             productNorthPanel.add(new JLabel("Manufacturer:"));
             productNorthPanel.add(manufacturers);
-            productNorthPanel.add(new JLabel("Commission Rate:"));
-            productNorthPanel.add(textProductCommission);
             
             // Setup product panel.
             createProductPanel.setLayout(new BorderLayout());
-            JScrollPane scrollPane = new JScrollPane(areaProductSummary);
             createProductPanel.add(productNorthPanel, BorderLayout.NORTH);
-            createProductPanel.add(scrollPane, BorderLayout.CENTER);
+            
+            greaterProductPanel.add(createProductPanel, BorderLayout.CENTER);
+            greaterProductPanel.add(productSouthPanel, BorderLayout.SOUTH);
         }
-
+        
 
         /**
          * This method builds the create manufacturer panel.
@@ -351,7 +427,7 @@ public class MainGui extends JFrame
         private void buildCreateManufacturerPanel()
         {
             JPanel manNorthPanel = new JPanel();
-            manNorthPanel.setLayout(new GridLayout(2,2));
+            manNorthPanel.setLayout(new GridLayout(4,2));
             areaManufacturerSummary = new JTextArea("Summary / Notes Here");
             manNorthPanel.add(new JLabel("Name:"));
             manNorthPanel.add(textManufacturerName);
@@ -359,16 +435,18 @@ public class MainGui extends JFrame
             manNorthPanel.add(textManufacturerLocation);
             manNorthPanel.add(new JLabel("Phone Number:"));
             manNorthPanel.add(textManufacturerPhoneNumber);
-            manNorthPanel.add(new JLabel("Sales Associate:"));
-            manNorthPanel.add(textManufacturerSalesAssociate);
+            
+            JButton createManufactuerButton = new JButton("Submit");
+            createManufactuerButton.addActionListener(new CreateManufactuerButtonListener());
             
             // Setup manufacturing panel.
             createManufacturerPanel.setLayout(new BorderLayout());
-            JScrollPane scrollPane = new JScrollPane(areaManufacturerSummary);
-            createManufacturerPanel.add(manNorthPanel, BorderLayout.NORTH);
-            createManufacturerPanel.add(scrollPane, BorderLayout.CENTER);
-        }
 
+            createManufacturerPanel.add(manNorthPanel, BorderLayout.NORTH);
+            createManufacturerPanel.add(createManufactuerButton, BorderLayout.SOUTH);
+
+        }
+        
 
         /**
          * This creates the employee selection panel.
@@ -382,16 +460,19 @@ public class MainGui extends JFrame
 
             areaSearchInventory = new JTextArea();
             areaSearchInventory.setEditable(false);
-
-            JRadioButton
-                searchProducts = new JRadioButton("Search Products", true),
-                searchManufacturers = new JRadioButton
-                                                  ("Search Manufacturer", false)
-            ;
-
+                  
+            SearchRadioButtonHandler rbHandler = new SearchRadioButtonHandler();
+            searchProducts.addItemListener(rbHandler);
+            searchManufacturers.addItemListener(rbHandler);
+            
+            JButton searchInventoryButton = new JButton("Search");
+            searchInventoryButton.addActionListener(new SearchInventoryButtonListener());
+            JPanel searchInventorySouthPanel = new JPanel();
+            searchInventorySouthPanel.add(searchInventoryButton);
+            
             inventorySearchSelectionGroup.add(searchProducts);
             inventorySearchSelectionGroup.add(searchManufacturers);
-
+            
             g.border(searchInventoryPanel, "Search Inventory:");
             invNorthPanel.add(searchProducts);
             invNorthPanel.add(searchManufacturers);
@@ -400,10 +481,30 @@ public class MainGui extends JFrame
             
             // Setup search inventory panel.
             searchInventoryPanel.setLayout(new BorderLayout());
-            JScrollPane scrollPane = new JScrollPane(areaSearchInventory);
-            searchInventoryPanel.add(invNorthPanel, BorderLayout.NORTH);
-            searchInventoryPanel.add(scrollPane, BorderLayout.CENTER);
-        }
+            
+            // if statment to deciede what table to use
+            if(chooseProdocutOrManufacturer == 0)
+            {
+                searchInventoryPanel.validate();
+                searchInventoryPanel.repaint();
+                JScrollPane scrollPane = new JScrollPane(productSearchTable); 
+                searchInventoryPanel.add(invNorthPanel, BorderLayout.NORTH);
+                searchInventoryPanel.add(scrollPane, BorderLayout.CENTER);
+                searchInventoryPanel.add(searchInventorySouthPanel, BorderLayout.SOUTH);
+            }
+            // if statment to deciede what table to use
+            else if(chooseProdocutOrManufacturer == 1)
+            {
+                searchInventoryPanel.validate();
+                searchInventoryPanel.repaint();
+                JScrollPane scrollPane = new JScrollPane(manufacturerSearchTable);
+                searchInventoryPanel.add(invNorthPanel, BorderLayout.NORTH);
+                searchInventoryPanel.add(scrollPane, BorderLayout.CENTER);
+                searchInventoryPanel.add(searchInventorySouthPanel, BorderLayout.SOUTH);
+            }
+        }//End of buildSearchInventoryPanel
+        
+
 
         /**
          * This method creates the sales panels used for creating new orders.
@@ -439,7 +540,7 @@ public class MainGui extends JFrame
             createSalesPanel.setLayout(new BorderLayout());
             createSalesPanel.add(salesNorthPanel, BorderLayout.NORTH);
             createSalesPanel.add(salesSouthPanel, BorderLayout.SOUTH);
-        }
+        }//End of buildCreateSalesPanel
 
         
         /**
@@ -471,7 +572,7 @@ public class MainGui extends JFrame
             editSalesPanel.setLayout(new BorderLayout());
             editSalesPanel.add(editSalesNorthPanel, BorderLayout.NORTH);
             editSalesPanel.add(editSalesSouthPanel, BorderLayout.SOUTH);
-        }
+        }//End of buildEditSalesPanel
         
         
         /**
@@ -484,15 +585,13 @@ public class MainGui extends JFrame
             editEmpNorthPanel.setLayout(new GridLayout(3,2));
 
             // Database Connection Here
-            JComboBox products = new JComboBox();
-            //products.setSelectedIndex(0);
+            JComboBox employees = new JComboBox();
             
             g.border(editEmpNorthPanel, "Employee Information");
             editEmpNorthPanel.add(new JLabel("Employee:"));
-            editEmpNorthPanel.add(products);
+            editEmpNorthPanel.add(employees);
             
             JPanel editEmpSouthPanel = new JPanel();
-            editEmpSouthPanel.setLayout(new FlowLayout());
             editEmpSouthPanel.add(editButton);
             editEmpSouthPanel.add(deleteButton);
             
@@ -503,7 +602,7 @@ public class MainGui extends JFrame
             editEmployeePanel.setLayout(new BorderLayout());
             editEmployeePanel.add(editEmpNorthPanel, BorderLayout.NORTH);
             editEmployeePanel.add(editEmpSouthPanel, BorderLayout.SOUTH);
-        }
+        }//End of buildEditEmployeesPanel
         
         
         /**
@@ -522,11 +621,10 @@ public class MainGui extends JFrame
             
             
             JPanel editInvCenterPanel = new JPanel();
-            editInvCenterPanel.setLayout(new GridLayout(3,2));
+            editInvCenterPanel.setLayout(new BorderLayout());
 
             // Database Connection Here
             JComboBox products = new JComboBox();
-            //products.setSelectedIndex(0);
             
             g.border(editInvCenterPanel, "Inventory Information");
             editInvCenterPanel.add(inventoryLabel);
@@ -548,7 +646,7 @@ public class MainGui extends JFrame
             editInventoryPanel.add(editInvNorthPanel, BorderLayout.NORTH);
             editInventoryPanel.add(editInvCenterPanel, BorderLayout.CENTER);
             editInventoryPanel.add(editInvSouthPanel, BorderLayout.SOUTH);
-        }
+        }//End of buildEditInventoryPanel
         
 
         /**
@@ -557,19 +655,33 @@ public class MainGui extends JFrame
         private void buildFooterPanel()
         {
             // Action Listeners.
-            submitButton.addActionListener(new SubmitButtonListener());
             exitButton.addActionListener(new ExitButtonListener());
 
             // Add items to the panel.
-            footerPanel.add(submitButton);
             footerPanel.add(exitButton);
-        }
+        }//End of buildFooterPanel
     /////////////////////// End of Build Panels ////////////////////////////////
     
     /* --------- Action Listeners ------------------------------------------- */
         /**
          * Private inner class for event handling.
          */
+        
+        private class SearchEmployeeButtonListener implements ActionListener
+        {
+            @Override public void actionPerformed(ActionEvent event)
+            {
+                // Add to database.
+                try 
+                {
+                    searchEmployee();    
+                } catch (Exception e) {
+                    System.out.print(e);
+                }
+            }
+        } // End of SearchEmployeeButtonListener inner class.
+        
+        
         private class ExitButtonListener implements ActionListener
         {
             @Override 
@@ -592,7 +704,7 @@ public class MainGui extends JFrame
         /**
          * Private inner class for event handling.
          */
-        private class SubmitButtonListener implements ActionListener
+        private class SubmitEmployeeButtonListener implements ActionListener
         {
             @Override 
             public void actionPerformed(ActionEvent event)
@@ -605,7 +717,14 @@ public class MainGui extends JFrame
                     JOptionPane.OK_CANCEL_OPTION)==JOptionPane.OK_OPTION
                 )
                 {
+                    
                     // Add to database.
+                    try 
+                    {
+                        insertEmployee();    
+                    } catch (SQLException e) {
+                        System.out.print(e);
+                    } 
                 }
             }
         } // End of SubmitButtonListener inner class.
@@ -650,7 +769,13 @@ public class MainGui extends JFrame
                     JOptionPane.OK_CANCEL_OPTION)==JOptionPane.OK_OPTION
                 )
                 {
-                    // Add to database.
+                    try
+                    {
+                        //add to database
+                        insertSales();
+                    } catch (Exception e) {
+                        System.out.print(e);
+                    } 
                 }
             }
         } // End of CreateButtonListener inner class.
@@ -709,6 +834,7 @@ public class MainGui extends JFrame
             @Override
             public void itemStateChanged(ItemEvent event)
             {
+                chooseEmployeeType =-1;
                 //set the textfields to visible based on what radio button is selected
                 //set the salary text field to be visible
                 if(salaryEmployee.isSelected())
@@ -718,6 +844,7 @@ public class MainGui extends JFrame
                     textCommissionRate.setText("");
                     textHourlyRate.setEditable(false);
                     textHourlyRate.setText("");
+                    chooseEmployeeType = 0;
                 }
                 //set the hourly text field to be visible
                 else if(hourlyEmployee.isSelected())
@@ -727,6 +854,7 @@ public class MainGui extends JFrame
                     textCommissionRate.setEditable(false);
                     textCommissionRate.setText("");
                     textHourlyRate.setEditable(true);
+                    chooseEmployeeType=1;
                 }
                 //set the commission text field to be visible
                 else if(commissionEmployee.isSelected())
@@ -736,6 +864,7 @@ public class MainGui extends JFrame
                     textCommissionRate.setEditable(true);
                     textHourlyRate.setEditable(false);
                     textHourlyRate.setText("");
+                    chooseEmployeeType=2;
                 }
                 //set the salary and commission text field to be visible
                 else if(basePlusCommissionEmployee.isSelected())
@@ -744,6 +873,7 @@ public class MainGui extends JFrame
                     textCommissionRate.setEditable(true);
                     textHourlyRate.setEditable(false);
                     textHourlyRate.setText("");
+                    chooseEmployeeType=3;
                 }
             }
         }//end of handler
@@ -758,13 +888,14 @@ public class MainGui extends JFrame
             @Override
             public void itemStateChanged(ItemEvent event)
             {
+                chooseProdocutOrManufacturer = -1;
                 //set the textfields to visible based on what radio button is selected
-                //set the salary text field to be visible
+                
                 if(productButton.isSelected())
                 {
                     inventoryLabel.setText("Products");
                 }
-                //set the hourly text field to be visible
+                // getting the manufactuer table
                 else if(manufacturerButton.isSelected())
                 {
                     inventoryLabel.setText("Manufacturers");
@@ -786,6 +917,77 @@ public class MainGui extends JFrame
                 //read(selection);
             }
         } // End of SubmitButtonListener inner class.
+        
+        
+        private class SearchProductButtonListener implements ActionListener
+        {
+            @Override public void actionPerformed(ActionEvent e) 
+            {
+                try 
+                {
+                    insertProduct();
+                } catch(SQLException e1)
+                {
+                    g.sqlError(e1, "Error");
+                }
+              
+            }
+        } // end of SearchProductButtonListener Listener
+        
+        
+        private class CreateManufactuerButtonListener implements ActionListener
+        {
+            @Override public void actionPerformed(ActionEvent e) 
+            {
+                try 
+                {
+                    insertManufacturer();
+                } 
+                catch (Exception e1) 
+                {
+                    g.generalError(e1, "Error");
+                }
+              
+            }
+        } // end of SearchProductButtonListener Listener
+        
+        
+        private class SearchInventoryButtonListener implements ActionListener
+        {
+            @Override public void actionPerformed(ActionEvent event)
+            {
+                try
+                {
+                    searchProductOrManufacturer();
+                }
+                catch(Exception e1)
+                {
+                    g.generalError(e1, "Error");
+                }
+            }
+        } // end of SearchInventoryButtonListener Listener
+        
+        private class SearchRadioButtonHandler implements ItemListener
+        {
+            @Override
+            public void itemStateChanged(ItemEvent event)
+            {
+                // this will be used to determine what table is selected
+                chooseProdocutOrManufacturer = -1;
+                //set the textfields to visible based on what radio button is selected
+                
+                if(searchProducts.isSelected())
+                {
+                    // a way to determine what to search for
+                    chooseProdocutOrManufacturer = 0;
+                }
+                // getting the manufactuer table
+                else if(searchManufacturers.isSelected())
+                {
+                    chooseProdocutOrManufacturer = 1;
+                }
+            }
+        }//end of handler
     /* --------- End of Action Listeners ------------------------------------ */
     
     /**
@@ -793,86 +995,436 @@ public class MainGui extends JFrame
      * @return
      * @throws SQLException 
      */
-    public static DefaultTableModel buildTableModel (ResultSet rs)
+    public static DefaultTableModel buildTableModel (ResultSet result)
             throws SQLException
     {
-        ResultSetMetaData metaData = rs.getMetaData();
+        ResultSetMetaData metaData = result.getMetaData();
         
-        // Get the column names and store them in a Vector.
-        Vector<String> columnNames = new Vector<String>();
+        Vector<String> colNames = new Vector<String>();
         
-        // Column count.
-        int columnCount = metaData.getColumnCount();
-        
-        // Loop to build the column names.
-        for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++)
+        for( int column = 1; column<=metaData.getColumnCount();column++)
         {
-            columnNames.add(metaData.getColumnName(columnIndex));
+            colNames.add(metaData.getColumnName(column));
         }
         
-        /**
-         * Create the Vector to hold the data(Vector of Vectors)
-         * This Vector will store all rows.
-         */
-        Vector<Vector<Object>> tableData = new Vector<Vector<Object>>();
+        Vector<Vector<Object>> data = new Vector<Vector<Object>>();
         
-        // Go through the resultSet.
-        while (rs.next())
+        while(result.next())
         {
-            // This will store each row.
-            Vector<Object> rowVector = new Vector<Object>();
+            Vector<Object> rowData = new Vector<Object>();
             
-            // Loop through the result set and get each object.
-            for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++)
+            for(int columnIndex = 1; columnIndex<=metaData.getColumnCount();columnIndex++)
             {
-                rowVector.add(rs.getObject(columnIndex));
+                rowData.add(result.getObject(columnIndex));
             }
+            data.add(rowData);
         }
-        
-        // Return.        
-        return new DefaultTableModel(tableData, columnNames);
-    }
+        return new DefaultTableModel(data,colNames);
+    }//End of buildTableModel
 
     
     public void buildTables()
     {
-        // Employee Search Table.
-        try
-        {
-            stat = conn.createStatement();
-            result = stat.executeQuery(QRY);
-            employeeSearchTable.setModel(buildTableModel(rs));
-        }
-        catch ( SQLException error ) { g.sqlError(error, "Error"); }
-           
-        // Product Search Table.
-        try
-        {
-            stat = conn.createStatement();
-            result = stat.executeQuery(QRY);
-            productSearchTable.setModel(buildTableModel(rs));
-        }
-        catch ( SQLException error ) { g.sqlError(error, "Error"); }
         
-        // Manufacturer Search Table.
+        final String DB_URL = "jdbc:mysql://sql.computerstudi.es:3306/gc200315409";
+        String userName = "gc200315409";
+        String password = "?8pDT38G";
+
         try
         {
-            stat = conn.createStatement();
-            result = stat.executeQuery(QRY);
-            manufacturerSearchTable.setModel(buildTableModel(rs));
+            conn = DriverManager.getConnection(DB_URL, userName,password);
         }
-        catch ( SQLException error ) { g.sqlError(error, "Error"); }
+        catch(SQLException e)
+        {
+            g.sqlError(e, "Error"); 
+        }
+        catch(Exception e1)
+        {
+            g.generalError(e1, "Error");
+        }
+        
+        //Recently Added by Ross to ensure integrity. Remove
+        //If errors arise.
+        if(conn != null)
+        {
+            // Employee Search Table.
+            try
+            {
+                final String QRY = "Select * FROM Employee";
+
+                stat = conn.createStatement();
+                rs = stat.executeQuery(QRY);
+
+                employeeSearchTable.setModel(buildTableModel(rs));
+            }
+            catch (SQLException error) 
+            { 
+                g.sqlError(error, "Error"); 
+            }
+            catch(Exception e1)
+            {
+                g.generalError(e1, "Error");
+            }
+
+            // Product Search Table.
+            try
+            {
+                final String QRY = "Select * FROM Products";
+
+                stat = conn.createStatement();
+                rs = stat.executeQuery(QRY);
+
+                productSearchTable.setModel(buildTableModel(rs));
+            }
+            catch (SQLException error) 
+            {
+                g.sqlError(error, "Error"); 
+            }
+            catch(Exception e1)
+            {
+                g.generalError(e1, "Error");
+            }
+
+            // Manufacturer Search Table.
+            try
+            {
+                final String QRY = "Select * FROM Manufacturer";
+
+                stat = conn.createStatement();
+                rs = stat.executeQuery(QRY);
+
+                manufacturerSearchTable.setModel(buildTableModel(rs));
+            }
+            catch (SQLException error) 
+            { 
+                g.sqlError(error, "Error"); 
+            }
+            catch(Exception e1)
+            {
+                g.generalError(e1, "Error");
+            }
+        }
     }
+    
+    
+    // inserting employee data into the database
+    public  void insertEmployee()
+            throws SQLException
+    {       
+        String userName = "gc200315409";
+        String password = "?8pDT38G";
+        
+        final String DB_URL = "jdbc:mysql://sql.computerstudi.es:3306/gc200315409";
+
+        try
+        {
+            conn = DriverManager.getConnection(DB_URL, userName,password);
+        }
+        catch(SQLException e)
+        {
+            g.sqlError(e, "Error"); 
+        }
+        catch(Exception e1)
+        {
+            g.generalError(e1, "Error");
+        }
+        
+        if(conn != null)
+        {
+            // adding a employee to the database
+            try 
+            {
+                  stat = conn.createStatement();
+                  String SQL = "INSERT INTO employee"
+                    + " (`firstname`, `lastname`, `gender`, `age`, `address`, `dateofbirth`, `phonenumber`, `sin`, `datehired`, `position`, "
+                    + "`status`, `hourlyrate`, `commissionrate`, `salaryrate`, `department`)"
+                    + "VALUES ('"+textFirstName.getText()+"', '"+ textLastName.getText()+"', '"+ textGender.getText()+ "', '" 
+                    + textAge.getText()+"', '"+textAddress.getText()+"', '"+textDateOfBirth.getText() +"', '"+ textPhoneNumber.getText()+"', '"
+                    + textSIN.getText()+ "', '"+ textDateHired.getText()+ "', '"+ textPosition.getText() + "', '"+ textStatus.getText()+"', '" 
+                    + textHourlyRate.getText()+"', '"+ textCommissionRate.getText()+ "', '"+ textSalary.getText()+"', '"+textDepartment.getText()+ "');";
+
+                stat.executeUpdate(SQL);
+            }
+            catch(SQLException e)
+            {
+                g.sqlError(e, "Error"); 
+            }
+            catch(Exception e1)
+            {
+                g.generalError(e1, "Error");
+            }
+        }
+    }//End of insertEmployee
+    
+    
+    // search for a Employee
+    public void searchEmployee()
+    {
+        try {
+            String userName = "gc200315409";
+            String password = "?8pDT38G";
+
+            final String DB_URL = "jdbc:mysql://sql.computerstudi.es:3306/gc200315409";
+            
+            String test = textSearchEmployees.getText();
+            final String QRY = "SELECT * FROM employee WHERE firstname LIKE '%"+test+"%';";
+            
+            // reseting the sql variables
+            Connection conn = null;
+            Statement stat = null;
+            ResultSet result = null;
+            
+            try
+            {
+                conn = DriverManager.getConnection(DB_URL, userName, password);
+                stat = conn.createStatement();
+                
+                result = stat.executeQuery(QRY);
+                ResultSetMetaData rsmd = result.getMetaData();
+
+                
+                int columnsNumber = rsmd.getColumnCount();
+                while (result.next()) 
+                {
+                    //Print one row          
+                    for(int i = 1 ; i <= columnsNumber; i++)
+                    {
+                        //System.out.print(result.getString(i) + " "); //Print one element of a row
+                        employeeSearchTable.setModel(buildTableModel(result)); //Print one element of a row
+                        //System.out.println(QRY);
+                    }          
+                }
+                result.close();
+                stat.close();
+                conn.close();
+            }
+            catch(SQLException e)
+            {
+                g.sqlError(e, "Error"); 
+            }
+ 
+        }
+        catch (NullPointerException e2) 
+        {
+            g.generalError(e2, "NullPointerException Error");
+        }
+        catch(Exception e1)
+        {
+            g.generalError(e1, "Error");
+        }
+    }
+    
+    
+    // method to insert a product
+    public void insertProduct()
+            throws SQLException
+    { 
+        String userName = "gc200315409";
+        String password = "?8pDT38G";
+        
+        final String DB_URL = "jdbc:mysql://sql.computerstudi.es:3306/gc200315409";
+        conn = DriverManager.getConnection(DB_URL, userName,password);
+
+        try {
+            String value = manufacturers.getSelectedItem().toString();
+            stat = conn.createStatement();
+            
+            String SQL = "INSERT INTO products"
+                + " (`name`, `code`, `price`, `manufacturer`)"
+                + "VALUES ('"+textProductName.getText()+"', '"+ textProductCode.getText()+"', '"+ textProductPrice.getText()+"', '"+value+  "');";
+                
+            //System.out.println(SQL);
+            stat.executeUpdate(SQL);
+        }
+        catch(SQLException e)
+        {
+            g.sqlError(e, "Error"); 
+        }
+        catch(Exception e1)
+        {
+            g.generalError(e1, "Error");
+        }
+    }
+    
+    
+    // A method to insert a new manufactuer
+    public void insertManufacturer()
+    {
+        String userName = "gc200315409";
+        String password = "?8pDT38G";
+        
+        final String DB_URL = "jdbc:mysql://sql.computerstudi.es:3306/gc200315409";
+        
+
+        try {
+            conn = DriverManager.getConnection(DB_URL, userName,password);
+            stat = conn.createStatement();
+            String SQL = "INSERT INTO manufacturer"
+                + " (`name`, `location`, `phonenumber`)"
+                + "VALUES ('"+textManufacturerName.getText()+"', '"+ textManufacturerLocation.getText()+"', '"+ textManufacturerPhoneNumber.getText()+"');";
+
+        //System.out.println(SQL);
+        
+        stat.executeUpdate(SQL);
+        
+        } catch(SQLException e)
+        {
+            g.sqlError(e, "Error"); 
+        }
+        catch(Exception e1)
+        {
+            g.generalError(e1, "Error");
+        }
+    }
+    
+    
+    // a method to search for either product or manufactuer
+    public void searchProductOrManufacturer()
+    {
+         
+        String userName = "gc200315409";
+        String password = "?8pDT38G";
+
+        final String DB_URL = "jdbc:mysql://sql.computerstudi.es:3306/gc200315409";
+                 
+
+        String test = textSearchInventory.getText();
+            
+            // to get the user input for a Product
+            if(chooseProdocutOrManufacturer == 0)
+            {
+                // getting the submited text
+                final String QRY = "SELECT * FROM products WHERE name LIKE '%"+test+"%';";
+            
+                Connection conn = null;
+                Statement stat = null;
+                ResultSet result = null;
+            
+                try
+                {
+                    conn = DriverManager.getConnection(DB_URL, userName, password);
+                    stat = conn.createStatement();
+
+                    result = stat.executeQuery(QRY);
+                    ResultSetMetaData rsmd = result.getMetaData();
+                    // gettinf the data to display in a table 
+                    int columnsNumber = rsmd.getColumnCount();
+                    while (result.next()) {
+                    //Print one row          
+                        for(int i = 1 ; i <= columnsNumber; i++){
+
+                            //System.out.print(result.getString(i) + " "); //Print one element of a row
+                            productSearchTable.setModel(buildTableModel(result)); //Print one element of a row
+                            //System.out.println(QRY);
+
+                        }//End of forloop        
+                    }//End of While
+
+                }//Begin catch
+                catch(SQLException e)
+                {
+                    g.sqlError(e, "Error"); 
+                }
+                catch(NullPointerException e2)
+                {
+                    g.generalError(e2, "Error");
+                }
+                catch(Exception e1)
+                {
+                    g.generalError(e1, "Error");
+                }
+            }//End of if(chooseProdocutOrManufacturer == 0)
+            
+            // to select a manufactuer
+            else if( chooseProdocutOrManufacturer == 1)
+            {
+                // select statement to get user inupt for a manufactuer
+                final String QRY = "SELECT * FROM manufacturer WHERE name LIKE '%"+test+"%';";
+            
+                Connection conn = null;
+                Statement stat = null;
+                ResultSet result = null;
+            
+                try
+                {
+                    conn = DriverManager.getConnection(DB_URL, userName, password);
+                    stat = conn.createStatement();
+
+                    result = stat.executeQuery(QRY);
+                    ResultSetMetaData rsmd = result.getMetaData();
+
+                    int columnsNumber = rsmd.getColumnCount();
+                    while (result.next()) {
+                        //Print one row          
+                        for(int i = 1 ; i <= columnsNumber; i++){
+                            //System.out.print(result.getString(i) + " "); //Print one element of a row
+                            manufacturerSearchTable.setModel(buildTableModel(result)); //Print one element of a row
+                            //System.out.println(QRY);
+
+                        }//End of forloop           
+                    }//End of whileloop
+                }
+                catch(SQLException e)
+                {
+                    g.sqlError(e, "Error"); 
+                }
+                catch(NullPointerException e2)
+                {
+                    g.generalError(e2, "Error");
+                }
+                catch(Exception e1)
+                {
+                    g.generalError(e1, "Error");
+                }
+            }
+    }
+    
+    
+    // a method to insert a sale
+    public void insertSales()
+    {
+        String userName = "gc200315409";
+        String password = "?8pDT38G";
+        
+        final String DB_URL = "jdbc:mysql://sql.computerstudi.es:3306/gc200315409";
+        
+
+        try {
+            conn = DriverManager.getConnection(DB_URL, userName,password);
+            
+            stat = conn.createStatement();
+            
+            String SQL = "INSERT INTO sales"
+                + " (`quantity`, `product`, `employee`)"
+                + "VALUES ('"+textSalesQuantity.getText()+"', '"
+                + textManufacturerLocation.getText()+"', '"+ textManufacturerPhoneNumber.getText()+"');";
+            
+            stat.executeUpdate(SQL);
+        
+        } 
+        catch(SQLException e)
+        {
+            g.sqlError(e, "Error"); 
+        }
+        catch(NullPointerException e2)
+        {
+            g.generalError(e2, "Error");
+        }
+            catch(Exception e1)
+        {
+            g.generalError(e1, "Error");
+        }
+    }//End of insertSales
     
     
     public void setupTabs()
     {
         // Human Resources Tabs.
-        g.setTab(hrTabPane, createEmployeePanel, "Create");
+        g.setTab(hrTabPane, greaterEmployeePanel, "Create");
         g.setTab(hrTabPane, searchEmployeePanel, "Search");
         
         // Sub Inventory Tabs.
-        g.setTab(subInventoryTabPane, createProductPanel, "Product");
+        g.setTab(subInventoryTabPane, greaterProductPanel, "Product");
         g.setTab(subInventoryTabPane, createManufacturerPanel, "Manufacturer");
         
         // Inventory Tabs.
@@ -895,6 +1447,6 @@ public class MainGui extends JFrame
         mainTabPane.addTab("HR", null , hrTabPane, "HR");
         mainTabPane.addTab("Inventory", null, inventoryTabPane, "Inventory");
         mainTabPane.addTab("Sales", null, salesTabPane, "Sales");
-    }
+    }//End of setupTabs
     
-} // End of UserGui class.
+} // End of MainGui class.

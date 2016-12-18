@@ -1,3 +1,7 @@
+/*
+* Manufacturer Class
+* Specifies the Manufacturor Object
+*/
 package factory;
 
 /**
