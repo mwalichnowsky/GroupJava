@@ -80,11 +80,11 @@ public class Global
         try
         {
             io.appendToFile(
-                    "******************************************************"
-                    + "\n"+ LocalDateTime.now()
-                    + "\nError description: \n"
-                    + error.getMessage()
-                    + "\n*******************************************************");
+                "******************************************************"
+                + "\n"+ LocalDateTime.now()
+                + "\nError description: \n"
+                + error.getMessage()
+                + "\n*******************************************************");
         }
         catch(IOException ioe)
         {
@@ -110,11 +110,11 @@ public class Global
         try
         {
             io.appendToFile(
-                    "******************************************************"
-                    + "\n"+ LocalDateTime.now()
-                    + "\nError description: \n"
-                    + error.getMessage()
-                    + "\n*******************************************************");
+                "******************************************************"
+                + "\n"+ LocalDateTime.now()
+                + "\nError description: \n"
+                + error.getMessage()
+                + "\n*******************************************************");
         }
         catch(IOException ioe)
         {

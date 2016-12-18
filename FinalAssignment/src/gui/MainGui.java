@@ -1134,14 +1134,26 @@ public class MainGui extends JFrame
             // adding a employee to the database
             try 
             {
-                  stat = conn.createStatement();
-                  String SQL = "INSERT INTO employee"
-                    + " (`firstname`, `lastname`, `gender`, `age`, `address`, `dateofbirth`, `phonenumber`, `sin`, `datehired`, `position`, "
-                    + "`status`, `hourlyrate`, `commissionrate`, `salaryrate`, `department`)"
-                    + "VALUES ('"+textFirstName.getText()+"', '"+ textLastName.getText()+"', '"+ textGender.getText()+ "', '" 
-                    + textAge.getText()+"', '"+textAddress.getText()+"', '"+textDateOfBirth.getText() +"', '"+ textPhoneNumber.getText()+"', '"
-                    + textSIN.getText()+ "', '"+ textDateHired.getText()+ "', '"+ textPosition.getText() + "', '"+ textStatus.getText()+"', '" 
-                    + textHourlyRate.getText()+"', '"+ textCommissionRate.getText()+ "', '"+ textSalary.getText()+"', '"+textDepartment.getText()+ "');";
+                stat = conn.createStatement();
+                
+                String SQL = "INSERT INTO employee"
+                        
+                    + " (`firstname`, `lastname`, `gender`, `age`, `address`, "
+                    + "`dateofbirth`, `phonenumber`, `sin`, `datehired`, "
+                    + "`position`, `status`, `hourlyrate`, `commissionrate`, "
+                    + "`salaryrate`, `department`) "
+                        
+                    + "VALUES ('"+textFirstName.getText()+"', " + "'"
+                    + textLastName.getText() + "', '" + textGender.getText()
+                    + "', '" + textAge.getText() + "', '"
+                    + textAddress.getText() + "', '" + textDateOfBirth.getText() 
+                    + "', '" + textPhoneNumber.getText() + "', '" 
+                    + textSIN.getText() + "', '" + textDateHired.getText()
+                    + "', '" + textPosition.getText() + "', '" 
+                    + textStatus.getText() + "', '" + textHourlyRate.getText()
+                    + "', '" + textCommissionRate.getText() + "', '" 
+                    + textSalary.getText() + "', '" + textDepartment.getText()
+                    + "');";
 
                 stat.executeUpdate(SQL);
             }
@@ -1164,10 +1176,13 @@ public class MainGui extends JFrame
             String userName = "gc200315409";
             String password = "?8pDT38G";
 
-            final String DB_URL = "jdbc:mysql://sql.computerstudi.es:3306/gc200315409";
+            final String DB_URL = 
+                           "jdbc:mysql://sql.computerstudi.es:3306/gc200315409";
             
-            String test = textSearchEmployees.getText();
-            final String QRY = "SELECT * FROM employee WHERE firstname LIKE '%"+test+"%';";
+            String text = textSearchEmployees.getText();
+            
+            final String QRY = "SELECT * FROM employee "
+                             + "WHERE firstname LIKE '%"+text+"%';";
             
             // reseting the sql variables
             Connection conn = null;
@@ -1189,9 +1204,9 @@ public class MainGui extends JFrame
                     //Print one row          
                     for(int i = 1 ; i <= columnsNumber; i++)
                     {
-                        //System.out.print(result.getString(i) + " "); //Print one element of a row
+                        System.out.print(result.getString(i) + " "); //Print one element of a row
                         employeeSearchTable.setModel(buildTableModel(result)); //Print one element of a row
-                        //System.out.println(QRY);
+                        System.out.println(QRY);
                     }          
                 }
                 result.close();

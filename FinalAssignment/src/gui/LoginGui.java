@@ -5,11 +5,14 @@
 package gui;
 
 import general.Global;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.Statement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -27,7 +30,9 @@ public class LoginGui extends JFrame
             loginUser, loginPassword
         ;
         
-        boolean isAdmin;
+        private boolean 
+            isAdmin, cancel = false, databaseCredidentialCheck = false
+        ;
         
         Global g = new Global();
         
@@ -57,30 +62,35 @@ public class LoginGui extends JFrame
         final JPasswordField textPassword = new JPasswordField(15);
 
         // Add components to the panel.
+        g.border(loginPanel, "Login");
         loginPanel.add(new JLabel("User Name:"));
         loginPanel.add(textUsername);
         loginPanel.add(new JLabel("Password:"));
         loginPanel.add(textPassword);
+        JButton cancelButton = new JButton("Cancel");
+        cancelButton.addActionListener(new CancelButtonListener());
+        loginPanel.add(cancelButton);
+        
 
-        // Boolean variable for loop control.
-        boolean databaseCredidentialCheck = false;
+        
 
         int databaseLoopCounter = 0;
 
         do
         {
-            String[] buttonOptions = new String[]{"OK", "Cancel"};
+            String[] buttonOptions = new String[]{"OK"};
 
             JOptionPane.showOptionDialog
             (
                 null,
                 loginPanel,
-                "Enter Password",
-                JOptionPane.NO_OPTION, 
+                "Enter Login",
+                JOptionPane.DEFAULT_OPTION, 
                 JOptionPane.PLAIN_MESSAGE,
                 null,
                 buttonOptions,
                 buttonOptions[0]
+                //cancelButton
             );
             
             loginUser = textUsername.getText();
@@ -99,7 +109,7 @@ public class LoginGui extends JFrame
                     String 
                         sql = "SELECT * FROM users "
                             + "WHERE username = '"+loginUser+"' ",
-                        rsUser = "", rsPassword = ""
+                        rsUser = "jhljhlh", rsPassword = "tsrusy"
                     ;
                     int rsId = 0;
 
@@ -192,9 +202,23 @@ public class LoginGui extends JFrame
         
         if (databaseCredidentialCheck == true)
         {
+            /*
+            try
+            {
+                rs.close();
+                stat.close();
+                connection.close();
+            }
+            catch (SQLException error) 
+            { 
+                g.sqlError(error, "Error closing connection");
+            }
+            */
             runGui(isAdmin);
         }
     }
+    
+    
     /* ----------------------- Methods -------------------------------------- */
         /**
          * This method checks if the user is a Admin or not.
@@ -210,4 +234,25 @@ public class LoginGui extends JFrame
         } // End of runGui.
     /////////////////////// End of methods /////////////////////////////////////
     
+        
+    private class CancelButtonListener implements ActionListener
+    {
+        @Override 
+        public void actionPerformed(ActionEvent event)
+        {
+            if 
+            (
+                JOptionPane.showConfirmDialog(null, 
+                "Are you sure you want to cancel?",
+                "Exit?", 
+                JOptionPane.OK_CANCEL_OPTION)==JOptionPane.OK_OPTION
+            )
+            {
+                cancel = true;
+                System.exit(0);
+                
+            }
+        }
+    } // End of ExitButtonListener inner class.
+        
 } // End of LoginGui class.
