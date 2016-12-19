@@ -32,7 +32,9 @@ public class MainGui extends JFrame
             employeeComboBox = new JComboBox(),
             productEditComboBox = new JComboBox(),
             productSalesComboBox = new JComboBox(),
-            employeeCreateSalesComboBox = new JComboBox()
+            employeeCreateSalesComboBox = new JComboBox(),
+            productCreateSalesComboBox = new JComboBox(),
+            manCreateProductComboBox = new JComboBox()
         ;
          
         final private JTextField 
@@ -130,7 +132,8 @@ public class MainGui extends JFrame
             deleteSalesButton = new JButton("Delete"),
             editInventoryButton = new JButton("Edit"), 
             deleteInventoryButton = new JButton("Delete"),
-            searchSalesButton= new JButton("Search")
+            searchSalesButton= new JButton("Search"),
+            createManufactuerButton = new JButton("Create")
         ;
         
         final private JTabbedPane 
@@ -409,7 +412,7 @@ public class MainGui extends JFrame
                 // use a loop to store each item
                 for (String string : itemNames) 
                 {
-                    manufacturersEditComboBox.addItem(string);
+                    manCreateProductComboBox.addItem(string);
                 }
             }
             catch(SQLException e1)
@@ -429,7 +432,7 @@ public class MainGui extends JFrame
             productNorthPanel.add(new JLabel("Price:"));
             productNorthPanel.add(textProductPrice);
             productNorthPanel.add(new JLabel("Manufacturer:"));
-            productNorthPanel.add(manufacturersEditComboBox);
+            productNorthPanel.add(manCreateProductComboBox);
             
             // Setup product panel.
             createProductPanel.setLayout(new BorderLayout());
@@ -455,7 +458,6 @@ public class MainGui extends JFrame
             manNorthPanel.add(new JLabel("Phone Number:"));
             manNorthPanel.add(textManufacturerPhoneNumber);
             
-            JButton createManufactuerButton = new JButton("Submit");
             createManufactuerButton.addActionListener(new CreateManufactuerButtonListener());
             
             // Setup manufacturing panel.
@@ -539,7 +541,7 @@ public class MainGui extends JFrame
             salesNorthPanel.add(new JLabel("Quantity:"));
             salesNorthPanel.add(textSalesQuantity);
             salesNorthPanel.add(new JLabel("Product:"));
-            salesNorthPanel.add(productSalesComboBox);
+            salesNorthPanel.add(productCreateSalesComboBox);
             salesNorthPanel.add(new JLabel("Employee:"));
             salesNorthPanel.add(employeeCreateSalesComboBox);
             
@@ -811,6 +813,8 @@ public class MainGui extends JFrame
                     {
                         //add to database
                         insertSales();
+                        
+                        
                     } 
                     catch (Exception e) 
                     {
@@ -1251,6 +1255,7 @@ public class MainGui extends JFrame
             while (rs.next())
             {
                 employeeComboBox.addItem(rs.getString("firstName"));
+                employeeCreateSalesComboBox.addItem(rs.getString("firstName"));
             }
         }
         catch (SQLException e) 
@@ -1279,6 +1284,7 @@ public class MainGui extends JFrame
                 while (rs.next())
                 {
                     productEditComboBox.addItem(rs.getString("name"));
+                    productCreateSalesComboBox.addItem(rs.getString("name"));
                 }
             } 
             else if (selection == "manufacturers")
@@ -1289,6 +1295,7 @@ public class MainGui extends JFrame
                 while (rs.next())
                 {
                     manufacturersEditComboBox.addItem(rs.getString("name"));
+                    manCreateProductComboBox.addItem(rs.getString("name"));
                 }
             }
         }
@@ -1383,7 +1390,7 @@ public class MainGui extends JFrame
 
         try 
         {
-            String value = manufacturers.getSelectedItem().toString();
+            String value = manCreateProductComboBox.getSelectedItem().toString();
             
             stat = conn.createStatement();
             
@@ -1535,8 +1542,8 @@ public class MainGui extends JFrame
             qry = "INSERT INTO sales"
                 + " (`quantity`, `product`, `employee`)"
                 + "VALUES ('"+textSalesQuantity.getText()+"', '"
-                + productSalesComboBox.getSelectedItem().toString()+"', '"
-                + employeeComboBox.getSelectedItem().toString()+"');";
+                + productCreateSalesComboBox.getSelectedItem().toString()+"', '"
+                + employeeCreateSalesComboBox.getSelectedItem().toString()+"');";
             
             stat.executeUpdate(qry);
         
