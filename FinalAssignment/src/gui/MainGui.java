@@ -908,12 +908,11 @@ public class MainGui extends JFrame
                     JOptionPane.OK_CANCEL_OPTION)==JOptionPane.OK_OPTION
                 )
                 {
-                    String emp = employeeComboBox.getSelectedItem().toString();
+                    String prod = productSalesComboBox.getSelectedItem().toString();
                     
                     // Delete from database.
-                    qry = g.deleteQuery("employee", "firstname", emp);
-                    System.out.println("Delete Query: " + "employee" 
-                            + "firstname" + emp);
+                    //qry = g.deleteQuery("sales", "product", prod);
+                    qry = "DELETE FROM sales WHERE product = '"+prod+"' ;";
                     delete(qry);
                 }
             }
