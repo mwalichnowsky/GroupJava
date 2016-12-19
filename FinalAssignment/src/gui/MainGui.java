@@ -493,24 +493,28 @@ public class MainGui extends JFrame
             // Setup search inventory panel.
             searchInventoryPanel.setLayout(new BorderLayout());
             
+            
+            JScrollPane manufacturerScrollPane = new JScrollPane(manufacturerSearchTable);
+            JScrollPane productScrollPane = new JScrollPane(productSearchTable); 
             // if statment to deciede what table to use
             if(chooseProdocutOrManufacturer == 0)
             {
-                searchInventoryPanel.validate();
-                searchInventoryPanel.repaint();
-                JScrollPane scrollPane = new JScrollPane(productSearchTable); 
+                System.out.println(chooseProdocutOrManufacturer+"p");
+                searchInventoryPanel.remove (manufacturerScrollPane); 
+                searchInventoryPanel.add(productScrollPane);
                 searchInventoryPanel.add(invNorthPanel, BorderLayout.NORTH);
-                searchInventoryPanel.add(scrollPane, BorderLayout.CENTER);
+                searchInventoryPanel.add(productScrollPane, BorderLayout.CENTER);
                 searchInventoryPanel.add(searchInventorySouthPanel, BorderLayout.SOUTH);
             }
             // if statment to deciede what table to use
             else if(chooseProdocutOrManufacturer == 1)
             {
-                searchInventoryPanel.validate();
-                searchInventoryPanel.repaint();
-                JScrollPane scrollPane = new JScrollPane(manufacturerSearchTable);
+                System.out.println(chooseProdocutOrManufacturer+"m");
+                System.out.println(chooseProdocutOrManufacturer);
+                searchInventoryPanel.remove (productScrollPane); 
+                searchInventoryPanel.add(manufacturerScrollPane);
                 searchInventoryPanel.add(invNorthPanel, BorderLayout.NORTH);
-                searchInventoryPanel.add(scrollPane, BorderLayout.CENTER);
+                searchInventoryPanel.add(manufacturerScrollPane, BorderLayout.CENTER);
                 searchInventoryPanel.add(searchInventorySouthPanel, BorderLayout.SOUTH);
             }
         }//End of buildSearchInventoryPanel
@@ -896,7 +900,6 @@ public class MainGui extends JFrame
             @Override
             public void itemStateChanged(ItemEvent event)
             {
-                chooseProdocutOrManufacturer = -1;
                 //set the textfields to visible based on what radio button is selected
                 
                 if(productButton.isSelected())
@@ -967,6 +970,7 @@ public class MainGui extends JFrame
                 try
                 {
                     searchProductOrManufacturer();
+                    
                 }
                 catch(Exception e1)
                 {
@@ -982,18 +986,25 @@ public class MainGui extends JFrame
             public void itemStateChanged(ItemEvent event)
             {
                 // this will be used to determine what table is selected
-                chooseProdocutOrManufacturer = -1;
+                
                 //set the textfields to visible based on what radio button is selected
                 
                 if(searchProducts.isSelected())
                 {
                     // a way to determine what to search for
+                    
                     chooseProdocutOrManufacturer = 0;
                 }
                 // getting the manufactuer table
                 else if(searchManufacturers.isSelected())
                 {
+                    
                     chooseProdocutOrManufacturer = 1;
+
+                }
+                else
+                {
+                    
                 }
             }
         }//end of handler
@@ -1290,18 +1301,9 @@ public class MainGui extends JFrame
                 stat = conn.createStatement();
                 rs = stat.executeQuery(QRY);
                 ResultSetMetaData rsmd = rs.getMetaData();
-
-                int columnsNumber = rsmd.getColumnCount();
-                while (rs.next()) 
-                {
-                    //Print one row          
-                    for(int i = 1 ; i <= columnsNumber; i++)
-                    {
-                        System.out.print(rs.getString(i) + " "); //Print one element of a row
-                        employeeSearchTable.setModel(buildTableModel(rs)); //Print one element of a row
-                        System.out.println(QRY);
-                    }          
-                }
+                
+                employeeSearchTable.setModel(buildTableModel(rs)); //Print one element of a row
+                        
                 rs.close();
                 stat.close();
                 conn.close();
@@ -1372,11 +1374,11 @@ public class MainGui extends JFrame
             
             stat = conn.createStatement();
             
-            String SQL = "INSERT INTO products"
-                + " (`name`, `code`, `price`, `manufacturer`)"
-                + "VALUES ('" + textProductName.getText() + "', '"
-                + textProductCode.getText() + "', '" 
-                + textProductPrice.getText() + "', '" + value + "');";
+            String SQL = "INSERT INTO manufacturer"
+                + " (`name`, `loaction`, `phonenumber`)"
+                + "VALUES ('" + textManufacturerName.getText() + "', '"
+                + textManufacturerLocation.getText() + "', '" 
+                + textManufacturerPhoneNumber.getText() + "');";
                 
             //System.out.println(SQL);
             stat.executeUpdate(SQL);
@@ -1415,18 +1417,8 @@ public class MainGui extends JFrame
 
                     rs = stat.executeQuery(QRY);
                     ResultSetMetaData rsmd = rs.getMetaData();
-                    // gettinf the data to display in a table 
-                    int columnsNumber = rsmd.getColumnCount();
-                    while (rs.next()) {
-                    //Print one row          
-                        for(int i = 1 ; i <= columnsNumber; i++){
 
-                            //System.out.print(result.getString(i) + " "); //Print one element of a row
-                            productSearchTable.setModel(buildTableModel(rs)); //Print one element of a row
-                            //System.out.println(QRY);
-
-                        }//End of forloop        
-                    }//End of While
+                    productSearchTable.setModel(buildTableModel(rs)); //Print one element of a row
 
                 }//Begin catch
                 catch(SQLException e)
@@ -1446,6 +1438,7 @@ public class MainGui extends JFrame
             // to select a manufactuer
             else if( chooseProdocutOrManufacturer == 1)
             {
+                
                 // select statement to get user inupt for a manufactuer
                 final String QRY = "SELECT * FROM manufacturer WHERE name LIKE '%"+test+"%';";
             
@@ -1461,17 +1454,8 @@ public class MainGui extends JFrame
 
                     rs = stat.executeQuery(QRY);
                     ResultSetMetaData rsmd = rs.getMetaData();
-
-                    int columnsNumber = rsmd.getColumnCount();
-                    while (rs.next()) {
-                        //Print one row          
-                        for(int i = 1 ; i <= columnsNumber; i++){
-                            //System.out.print(result.getString(i) + " "); //Print one element of a row
-                            manufacturerSearchTable.setModel(buildTableModel(rs)); //Print one element of a row
-                            //System.out.println(QRY);
-
-                        }//End of forloop           
-                    }//End of whileloop
+                    manufacturerSearchTable.setModel(buildTableModel(rs)); //Print one element of a row
+                    
                 }
                 catch(SQLException e)
                 {
