@@ -134,7 +134,8 @@ public class MainGui extends JFrame
             editInventoryButton = new JButton("Edit"), 
             deleteInventoryButton = new JButton("Delete"),
             searchSalesButton= new JButton("Search"),
-            createManufactuerButton = new JButton("Create")
+            createManufactuerButton = new JButton("Create"),
+            searchEmployeeButton = new JButton("Search")
         ;
         
         final private JTabbedPane 
@@ -344,21 +345,25 @@ public class MainGui extends JFrame
          */
         private void buildSearchEmployeePanel()
         {
-            JPanel searchEmpNorthPanel = new JPanel();
-            searchEmpNorthPanel.setLayout(new FlowLayout());
             g.border(searchEmployeePanel, "Search Employees:");
             
-            JButton searchEmployeeButton = new JButton("Search");
-            searchEmployeeButton.addActionListener(new SearchEmployeeButtonListener());
+            // North
+            JPanel searchEmpNorthPanel = new JPanel();
+            searchEmpNorthPanel.setLayout(new GridLayout(1,1));
+            searchEmpNorthPanel.add(new JLabel("Search Employees:"));
+            searchEmpNorthPanel.add(textSearchEmployees); 
             
+            // Center
+            areaSearchResults.setEditable(false);
+            searchEmployeePanel.setLayout(new FlowLayout());
+            JScrollPane scrollPane = new JScrollPane(employeeSearchTable);
+            
+            // South
             JPanel searchEmpSouthPanel = new JPanel();
+            searchEmpSouthPanel.setLayout(new FlowLayout());
+            searchEmployeeButton.addActionListener(new SearchEmployeeButtonListener());
             searchEmpSouthPanel.add(searchEmployeeButton);
             
-            searchEmpNorthPanel.add(new JLabel("Search Employees:"));
-            searchEmpNorthPanel.add(textSearchEmployees);          
-            areaSearchResults.setEditable(false);
-            searchEmployeePanel.setLayout(new BorderLayout());
-            JScrollPane scrollPane = new JScrollPane(employeeSearchTable);
             searchEmployeePanel.add(searchEmpNorthPanel, BorderLayout.NORTH);
             searchEmployeePanel.add(scrollPane, BorderLayout.CENTER);
             searchEmployeePanel.add(searchEmpSouthPanel, BorderLayout.SOUTH);
@@ -596,7 +601,8 @@ public class MainGui extends JFrame
             
             // Action Listeners.
             editEmployeeButton.addActionListener(new EditButtonListener());
-            deleteEmployeeButton.addActionListener(new DeleteButtonListener());
+            deleteEmployeeButton.addActionListener
+                                           (new DeleteButtonListener());
             
             editEmployeePanel.setLayout(new BorderLayout());
             editEmployeePanel.add(editEmpNorthPanel, BorderLayout.NORTH);
@@ -847,6 +853,7 @@ public class MainGui extends JFrame
                 )
                 {
                     // Delete from database.
+                    //g.delete(item);
                 }
             }
         } // End of DeleteButtonListener inner class.

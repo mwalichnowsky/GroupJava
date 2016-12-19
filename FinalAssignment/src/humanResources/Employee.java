@@ -18,8 +18,7 @@ public class Employee
     /////////////////////// End of Variables ///////////////////////////////////
         
         
-    /* -----------------Constructor (Full Employ,kl;/".ee Setup)-----------------------
-        "?><L/l;m
+    /* -----------------Constructor (Full Employlee Setup)----------------------
      * @param firstName = Joe
      * @param lastName = Blow
      * @param gender = Male

@@ -5,6 +5,8 @@
 package general;
 
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import javax.swing.BorderFactory;
 import javax.swing.JOptionPane;
@@ -148,4 +150,9 @@ public class Global
         return "?8pDT38G";
     }
     
+    
+    public void delete(String delete)
+    {
+        
+    }
 } // End of Global class.
