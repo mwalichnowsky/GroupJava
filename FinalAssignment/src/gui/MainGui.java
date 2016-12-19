@@ -888,11 +888,15 @@ public class MainGui extends JFrame
                     // Delete from database.
                     if (selection == "product")
                     {
-                        qry = g.deleteQuery("product", "name", inv);
+                        //qry = g.deleteQuery("product", "name", inv);
+                        qry = "DELETE FROM products WHERE name = '"+inv+"' ;";
+                        delete(qry);
                     }
                     else if (selection == "manufacturer")
                     {
-                        qry = g.deleteQuery("manufacturer", "name", inv);
+                        //qry = g.deleteQuery("manufacturer", "name", inv);
+                        qry = "DELETE FROM manufacturer WHERE name = '"+inv+"' ;";
+                        delete(qry);
                     }
                     
                 }
