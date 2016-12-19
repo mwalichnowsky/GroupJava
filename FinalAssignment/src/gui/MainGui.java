@@ -476,7 +476,7 @@ public class MainGui extends JFrame
         }
         
 
-        /**
+       /**
          * This creates the employee selection panel.
          * @param labelMessage 
          */
@@ -1008,14 +1008,18 @@ public class MainGui extends JFrame
             {
                 try
                 {
-                    revalidate();
-                repaint();
+                 searchProductOrManufacturer();
+                 manufacturerScrollPane = new JScrollPane(manufacturerSearchTable);
+                 productScrollPane = new JScrollPane(productSearchTable); 
                    
-                    searchProductOrManufacturer();
+                    
                     if(chooseProdocutOrManufacturer == 0)
             {
-                
+                revalidate();
+                repaint();
+
                 searchInventoryPanel.add(productScrollPane, BorderLayout.CENTER);
+               
                 System.out.println(chooseProdocutOrManufacturer);
 
             }
@@ -1023,7 +1027,8 @@ public class MainGui extends JFrame
             // if statment to deciede what table to use
             else if(chooseProdocutOrManufacturer == 1)
             {
-                
+                revalidate();
+                repaint();
                 searchInventoryPanel.add(manufacturerScrollPane, BorderLayout.CENTER);
                 System.out.println(chooseProdocutOrManufacturer);
             }
@@ -1034,6 +1039,7 @@ public class MainGui extends JFrame
                 {
                     g.generalError(e1, "Error");
                 }
+               
             }
         } // end of SearchInventoryButtonListener Listener
         
@@ -1399,12 +1405,9 @@ public class MainGui extends JFrame
 
         try 
         {
-<<<<<<< HEAD
+
             String value = manCreateProductComboBox.getSelectedItem().toString();
-=======
-            String value = manufacturer.getSelectedItem().toString();
->>>>>>> cae023d166151ba322548801c350ab9285359268
-            
+
             stat = conn.createStatement();
             
             String SQL = "INSERT INTO products"
