@@ -107,6 +107,7 @@ public class MainGui extends JFrame
             createProductPanel  = new JPanel(), 
             createManufacturerPanel = new JPanel(), 
             greaterProductPanel = new JPanel(),
+            invNorthPanel = new JPanel(),
             
             /* Sales Panels */
             createSalesPanel = new JPanel(), searchSalesPanel = new JPanel(),
@@ -173,6 +174,8 @@ public class MainGui extends JFrame
         boolean isAdmin;
         private int chooseEmployeeType;
         private int chooseProdocutOrManufacturer;
+        JScrollPane manufacturerScrollPane = new JScrollPane(manufacturerSearchTable);
+        JScrollPane productScrollPane = new JScrollPane(productSearchTable); 
         
        
         
@@ -474,7 +477,7 @@ public class MainGui extends JFrame
          */
         private void buildSearchInventoryPanel()
         {
-            JPanel invNorthPanel = new JPanel();
+            
             invNorthPanel.setLayout(new FlowLayout());
             ButtonGroup inventorySearchSelectionGroup = new ButtonGroup();
 
@@ -502,30 +505,10 @@ public class MainGui extends JFrame
             // Setup search inventory panel.
             searchInventoryPanel.setLayout(new BorderLayout());
             
+            searchInventoryPanel.add(invNorthPanel, BorderLayout.NORTH);
+            searchInventoryPanel.add(searchInventorySouthPanel, BorderLayout.SOUTH);
             
-            JScrollPane manufacturerScrollPane = new JScrollPane(manufacturerSearchTable);
-            JScrollPane productScrollPane = new JScrollPane(productSearchTable); 
-            // if statment to deciede what table to use
-            if(chooseProdocutOrManufacturer == 0)
-            {
-                System.out.println(chooseProdocutOrManufacturer+"p");
-                searchInventoryPanel.remove (manufacturerScrollPane); 
-                searchInventoryPanel.add(productScrollPane);
-                searchInventoryPanel.add(invNorthPanel, BorderLayout.NORTH);
-                searchInventoryPanel.add(productScrollPane, BorderLayout.CENTER);
-                searchInventoryPanel.add(searchInventorySouthPanel, BorderLayout.SOUTH);
-            }
-            // if statment to deciede what table to use
-            else if(chooseProdocutOrManufacturer == 1)
-            {
-                System.out.println(chooseProdocutOrManufacturer+"m");
-                System.out.println(chooseProdocutOrManufacturer);
-                searchInventoryPanel.remove (productScrollPane); 
-                searchInventoryPanel.add(manufacturerScrollPane);
-                searchInventoryPanel.add(invNorthPanel, BorderLayout.NORTH);
-                searchInventoryPanel.add(manufacturerScrollPane, BorderLayout.CENTER);
-                searchInventoryPanel.add(searchInventorySouthPanel, BorderLayout.SOUTH);
-            }
+            
         }//End of buildSearchInventoryPanel
         
 
@@ -1018,7 +1001,26 @@ public class MainGui extends JFrame
             {
                 try
                 {
+                    revalidate();
+                repaint();
+                   
                     searchProductOrManufacturer();
+                    if(chooseProdocutOrManufacturer == 0)
+            {
+                
+                searchInventoryPanel.add(productScrollPane, BorderLayout.CENTER);
+                System.out.println(chooseProdocutOrManufacturer);
+
+            }
+                    
+            // if statment to deciede what table to use
+            else if(chooseProdocutOrManufacturer == 1)
+            {
+                
+                searchInventoryPanel.add(manufacturerScrollPane, BorderLayout.CENTER);
+                System.out.println(chooseProdocutOrManufacturer);
+            }
+                    
                     
                 }
                 catch(Exception e1)
@@ -1390,7 +1392,11 @@ public class MainGui extends JFrame
 
         try 
         {
+<<<<<<< HEAD
             String value = manCreateProductComboBox.getSelectedItem().toString();
+=======
+            String value = manufacturer.getSelectedItem().toString();
+>>>>>>> cae023d166151ba322548801c350ab9285359268
             
             stat = conn.createStatement();
             
