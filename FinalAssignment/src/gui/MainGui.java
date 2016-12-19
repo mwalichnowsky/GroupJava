@@ -570,7 +570,8 @@ public class MainGui extends JFrame
             
             // Action Listeners.
             editSalesButton.addActionListener(new EditButtonListener());
-            deleteSalesButton.addActionListener(new DeleteButtonListener());
+            deleteSalesButton.addActionListener
+                                              (new DeleteSalesButtonListener());
             
             editSalesPanel.setLayout(new BorderLayout());
             editSalesPanel.add(editSalesNorthPanel, BorderLayout.NORTH);
@@ -602,7 +603,7 @@ public class MainGui extends JFrame
             // Action Listeners.
             editEmployeeButton.addActionListener(new EditButtonListener());
             deleteEmployeeButton.addActionListener
-                                                 (new DeleteButtonListener());
+                                           (new DeleteEmployeeButtonListener());
             
             editEmployeePanel.setLayout(new BorderLayout());
             editEmployeePanel.add(editEmpNorthPanel, BorderLayout.NORTH);
@@ -641,7 +642,8 @@ public class MainGui extends JFrame
             
             // Action Listeners.
             editInventoryButton.addActionListener(new EditButtonListener());
-            deleteInventoryButton.addActionListener(new DeleteButtonListener());
+            deleteInventoryButton.addActionListener
+                                          (new DeleteInventoryButtonListener());
             InvRadioButtonHandler rbHandler = new InvRadioButtonHandler();
             productButton.addItemListener(rbHandler);
             manufacturerButton.addItemListener(rbHandler);
@@ -839,7 +841,7 @@ public class MainGui extends JFrame
         /**
          * Private inner class for event handling.
          */
-        private class DeleteButtonListener implements ActionListener
+        private class DeleteEmployeeButtonListener implements ActionListener
         {
             @Override 
             public void actionPerformed(ActionEvent event)
@@ -852,8 +854,67 @@ public class MainGui extends JFrame
                     JOptionPane.OK_CANCEL_OPTION)==JOptionPane.OK_OPTION
                 )
                 {
+                    String emp = employeeComboBox.getSelectedItem().toString();
+                    
                     // Delete from database.
-                    //g.delete(item);
+                    qry = g.deleteQuery("employee", "firstname", emp);
+                    qry = "DELETE FROM employee WHERE firstname = '"+emp+"' ;";
+                    System.out.println("Delete Query: " + "employee" 
+                            + "firstname" + emp);
+                    delete(qry);
+                }
+            }
+        } // End of DeleteButtonListener inner class.
+        
+        
+                /**
+         * Private inner class for event handling.
+         */
+        private class DeleteInventoryButtonListener implements ActionListener
+        {
+            @Override 
+            public void actionPerformed(ActionEvent event)
+            {
+                if 
+                (
+                    JOptionPane.showConfirmDialog(null, 
+                    "Are you sure you want to delete?",
+                    "Delete?", 
+                    JOptionPane.OK_CANCEL_OPTION)==JOptionPane.OK_OPTION
+                )
+                {
+                    String emp = employeeComboBox.getSelectedItem().toString();
+                    
+                    // Delete from database.
+                    qry = g.deleteQuery("employee", "firstname", emp);
+                }
+            }
+        } // End of DeleteButtonListener inner class.
+        
+        
+                /**
+         * Private inner class for event handling.
+         */
+        private class DeleteSalesButtonListener implements ActionListener
+        {
+            @Override 
+            public void actionPerformed(ActionEvent event)
+            {
+                if 
+                (
+                    JOptionPane.showConfirmDialog(null, 
+                    "Are you sure you want to delete?",
+                    "Delete?", 
+                    JOptionPane.OK_CANCEL_OPTION)==JOptionPane.OK_OPTION
+                )
+                {
+                    String emp = employeeComboBox.getSelectedItem().toString();
+                    
+                    // Delete from database.
+                    qry = g.deleteQuery("employee", "firstname", emp);
+                    System.out.println("Delete Query: " + "employee" 
+                            + "firstname" + emp);
+                    delete(qry);
                 }
             }
         } // End of DeleteButtonListener inner class.
@@ -1608,4 +1669,28 @@ public class MainGui extends JFrame
         mainTabPane.addTab("Sales", null, salesTabPane, "Sales");
     }//End of setupTabs
 
+    
+    public void delete(String qry)
+    {
+        try
+        {
+            System.out.println(qry);
+            stat = g.getConn().createStatement();
+            stat.executeUpdate(qry);
+        }
+        catch(SQLException e)
+        {
+            g.sqlError(e, "Error"); 
+        }
+        catch(NullPointerException e2)
+        {
+            g.generalError(e2, "Error");
+        }
+        catch(Exception e1)
+        {
+            g.generalError(e1, "Error");
+        }
+    } // End of delete.
+        
+        
 } // End of MainGui class.

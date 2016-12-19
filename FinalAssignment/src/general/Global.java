@@ -13,6 +13,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import java.io.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -151,8 +153,28 @@ public class Global
     }
     
     
-    public void delete(String delete)
+    public String deleteQuery
+    (
+        String tableName, String columnName, String someValue
+    )
     {
-        
+        return "DELETE FROM '"+tableName+"' "
+             + "WHERE '"+columnName+"' = '"+someValue+"' ;";
+    }
+    
+
+    public Connection getConn()
+    {
+        Connection conn = null;
+        try 
+        { 
+            conn = DriverManager.getConnection
+            (
+                getDb(), getDbUser(), getDbPass()
+            ); 
+        } 
+        catch (SQLException e) { sqlError(e, "Connection Error."); }
+        catch (Exception e) { generalError(e, "Connection Error."); }
+        return conn;
     }
 } // End of Global class.
