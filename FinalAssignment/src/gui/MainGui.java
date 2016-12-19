@@ -1352,7 +1352,7 @@ public class MainGui extends JFrame
     
     public void populateInventoryComboBox(String selection)
     {
-        //inventoryEditComboBox.ResetText());
+        inventoryEditComboBox.removeAllItems();
         try
         {
             conn = DriverManager.getConnection
