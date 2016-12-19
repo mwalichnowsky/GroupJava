@@ -30,7 +30,7 @@ public class MainGui extends JFrame
         private JComboBox 
             manufacturersEditComboBox = new JComboBox(), 
             employeeComboBox = new JComboBox(),
-            productEditComboBox = new JComboBox(),
+            inventoryEditComboBox = new JComboBox(),
             productSalesComboBox = new JComboBox(),
             employeeCreateSalesComboBox = new JComboBox(),
             productCreateSalesComboBox = new JComboBox(),
@@ -633,7 +633,7 @@ public class MainGui extends JFrame
             g.border(editInvCenterPanel, "Inventory Information");
             editInvCenterPanel.setLayout(new FlowLayout());
             editInvCenterPanel.add(inventoryLabel);
-            editInvCenterPanel.add(productEditComboBox);
+            editInvCenterPanel.add(inventoryEditComboBox);
             
             JPanel editInvSouthPanel = new JPanel();
             editInvSouthPanel.setLayout(new FlowLayout());
@@ -867,7 +867,7 @@ public class MainGui extends JFrame
         } // End of DeleteButtonListener inner class.
         
         
-                /**
+        /**
          * Private inner class for event handling.
          */
         private class DeleteInventoryButtonListener implements ActionListener
@@ -883,16 +883,24 @@ public class MainGui extends JFrame
                     JOptionPane.OK_CANCEL_OPTION)==JOptionPane.OK_OPTION
                 )
                 {
-                    String emp = employeeComboBox.getSelectedItem().toString();
+                    String inv = inventoryEditComboBox.getSelectedItem().toString();
                     
                     // Delete from database.
-                    qry = g.deleteQuery("employee", "firstname", emp);
+                    if (selection == "product")
+                    {
+                        qry = g.deleteQuery("product", "name", inv);
+                    }
+                    else if (selection == "manufacturer")
+                    {
+                        qry = g.deleteQuery("manufacturer", "name", inv);
+                    }
+                    
                 }
             }
         } // End of DeleteButtonListener inner class.
         
         
-                /**
+        /**
          * Private inner class for event handling.
          */
         private class DeleteSalesButtonListener implements ActionListener
@@ -988,12 +996,14 @@ public class MainGui extends JFrame
                 {
                     inventoryLabel.setText("Products");
                     populateInventoryComboBox("products");
+                    selection = "product";
                 }
                 // getting the manufactuer table
                 else if(manufacturerButton.isSelected())
                 {
                     inventoryLabel.setText("Manufacturers");
                     populateInventoryComboBox("manufacturers");
+                    selection = "manufacturer";
                 }
             }
         }//end of handler
@@ -1342,6 +1352,7 @@ public class MainGui extends JFrame
     
     public void populateInventoryComboBox(String selection)
     {
+        //inventoryEditComboBox.ResetText());
         try
         {
             conn = DriverManager.getConnection
@@ -1358,7 +1369,7 @@ public class MainGui extends JFrame
                 
                 while (rs.next())
                 {
-                    productEditComboBox.addItem(rs.getString("name"));
+                    inventoryEditComboBox.addItem(rs.getString("name"));
                     productCreateSalesComboBox.addItem(rs.getString("name"));
                 }
             } 
@@ -1369,7 +1380,7 @@ public class MainGui extends JFrame
                 
                 while (rs.next())
                 {
-                    manufacturersEditComboBox.addItem(rs.getString("name"));
+                    inventoryEditComboBox.addItem(rs.getString("name"));
                     manCreateProductComboBox.addItem(rs.getString("name"));
                 }
             }
