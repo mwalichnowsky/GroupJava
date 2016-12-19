@@ -28,7 +28,8 @@ public class MainGui extends JFrame
     /* ----------------------- Variables------------------------------------- */
     
         private JComboBox 
-            manufacturers = new JComboBox(), employees = new JComboBox()
+            manufacturers = new JComboBox(), employees = new JComboBox(),
+            products = new JComboBox()
         ;
          
         final private JTextField 
@@ -118,8 +119,12 @@ public class MainGui extends JFrame
             submitButton = new JButton("Submit"), 
             createButton = new JButton("Create"),
             clearButton = new JButton("Clear"), 
-            editButton = new JButton("Edit"), 
-            deleteButton = new JButton("Delete")
+            editEmployeeButton = new JButton("Edit"), 
+            deleteEmployeeButton = new JButton("Delete"),
+            editSalesButton = new JButton("Edit"), 
+            deleteSalesButton = new JButton("Delete"),
+            editInventoryButton = new JButton("Edit"), 
+            deleteInventoryButton = new JButton("Delete")
         ;
         
         final private JTabbedPane 
@@ -145,6 +150,7 @@ public class MainGui extends JFrame
             searchManufacturers = new JRadioButton("Search Manufacturer", false)
         ;
         
+        private String selection = "products";
         JLabel inventoryLabel = new JLabel("Products:");
         
         Connection conn = null;
@@ -555,10 +561,8 @@ public class MainGui extends JFrame
         {
             JPanel editSalesNorthPanel = new JPanel();
             editSalesNorthPanel.setLayout(new GridLayout(3,2));
-
-            // Database Connection Here
-            JComboBox products = new JComboBox();
-            //products.setSelectedIndex(0);
+            
+            populateSalesComboBox();
             
             g.border(editSalesNorthPanel, "Sales Information");
             editSalesNorthPanel.add(new JLabel("Sale:"));
@@ -566,12 +570,12 @@ public class MainGui extends JFrame
             
             JPanel editSalesSouthPanel = new JPanel();
             editSalesSouthPanel.setLayout(new FlowLayout());
-            editSalesSouthPanel.add(editButton);
-            editSalesSouthPanel.add(deleteButton);
+            editSalesSouthPanel.add(editSalesButton);
+            editSalesSouthPanel.add(deleteSalesButton);
             
             // Action Listeners.
-            editButton.addActionListener(new EditButtonListener());
-            deleteButton.addActionListener(new DeleteButtonListener());
+            editSalesButton.addActionListener(new EditButtonListener());
+            deleteSalesButton.addActionListener(new DeleteButtonListener());
             
             editSalesPanel.setLayout(new BorderLayout());
             editSalesPanel.add(editSalesNorthPanel, BorderLayout.NORTH);
@@ -595,16 +599,18 @@ public class MainGui extends JFrame
             editEmpNorthPanel.add(employees);
             
             JPanel editEmpSouthPanel = new JPanel();
-            editEmpSouthPanel.add(editButton);
-            editEmpSouthPanel.add(deleteButton);
+            g.border(editEmpSouthPanel, "Options");
+            editEmpSouthPanel.setLayout(new FlowLayout());
+            editEmpSouthPanel.add(editEmployeeButton);
+            editEmpSouthPanel.add(deleteEmployeeButton);
             
             // Action Listeners.
-            editButton.addActionListener(new EditButtonListener());
-            deleteButton.addActionListener(new DeleteButtonListener());
+            editEmployeeButton.addActionListener(new EditButtonListener());
+            deleteEmployeeButton.addActionListener(new DeleteButtonListener());
             
             editEmployeePanel.setLayout(new BorderLayout());
             editEmployeePanel.add(editEmpNorthPanel, BorderLayout.NORTH);
-            editEmployeePanel.add(editEmpSouthPanel, BorderLayout.SOUTH);
+            editEmployeePanel.add(editEmpSouthPanel, BorderLayout.CENTER);
         }//End of buildEditEmployeesPanel
         
         
@@ -635,12 +641,12 @@ public class MainGui extends JFrame
             
             JPanel editInvSouthPanel = new JPanel();
             editInvSouthPanel.setLayout(new FlowLayout());
-            editInvSouthPanel.add(editButton);
-            editInvSouthPanel.add(deleteButton);
+            editInvSouthPanel.add(editInventoryButton);
+            editInvSouthPanel.add(deleteInventoryButton);
             
             // Action Listeners.
-            editButton.addActionListener(new EditButtonListener());
-            deleteButton.addActionListener(new DeleteButtonListener());
+            editInventoryButton.addActionListener(new EditButtonListener());
+            deleteInventoryButton.addActionListener(new DeleteButtonListener());
             InvRadioButtonHandler rbHandler = new InvRadioButtonHandler();
             productButton.addItemListener(rbHandler);
             manufacturerButton.addItemListener(rbHandler);
@@ -1188,6 +1194,72 @@ public class MainGui extends JFrame
             while (rs.next())
             {
                 employees.addItem(rs.getString("firstName"));
+            }
+        }
+        catch (SQLException e) 
+        {
+            g.sqlError(e, "");
+        } 
+    }
+    
+    
+    public void populateInventoryComboBox(String selection)
+    {
+        String selection;
+        try
+        {
+            final String qry = "SELECT * FROM '"+selection+"' ";
+            
+            conn = DriverManager.getConnection
+            (
+                g.getDb(), g.getDbUser(), g.getDbPass()
+            );
+            
+            stat = conn.createStatement();
+            
+            rs = stat.executeQuery(qry);
+            
+            if (selection == "products")
+            {
+                while (rs.next())
+                {
+                    products.addItem(rs.getString("name"));
+                }
+            }
+            else if (selection == "manufacturers")
+            {
+                while (rs.next())
+                {
+                    manufacturers.addItem(rs.getString("name"));
+                }
+            }
+            
+        }
+        catch (SQLException e) 
+        {
+            g.sqlError(e, "");
+        } 
+    }
+    
+    
+    public void populateSalesComboBox()
+    {
+        try
+        {
+            final String qry = "SELECT * FROM sales ";
+            
+            conn = DriverManager.getConnection
+            (
+                g.getDb(), g.getDbUser(), g.getDbPass()
+            );
+            
+            stat = conn.createStatement();
+            
+            rs = stat.executeQuery(qry);
+            
+            while (rs.next())
+            {
+                products.addItem(rs.getString("product"));
             }
         }
         catch (SQLException e) 
