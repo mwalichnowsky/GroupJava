@@ -602,7 +602,7 @@ public class MainGui extends JFrame
             // Action Listeners.
             editEmployeeButton.addActionListener(new EditButtonListener());
             deleteEmployeeButton.addActionListener
-                                           (new DeleteButtonListener());
+                                                 (new DeleteButtonListener());
             
             editEmployeePanel.setLayout(new BorderLayout());
             editEmployeePanel.add(editEmpNorthPanel, BorderLayout.NORTH);
