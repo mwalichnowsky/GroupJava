@@ -36,6 +36,7 @@ public class Global
         return greetFont;
     }//End of getGreetFont
 
+    
     /**
      *
      * @return

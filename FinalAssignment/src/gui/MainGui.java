@@ -28,8 +28,10 @@ public class MainGui extends JFrame
     /* ----------------------- Variables------------------------------------- */
     
         private JComboBox 
-            manufacturers = new JComboBox(), employees = new JComboBox(),
-            products = new JComboBox()
+            manufacturersEditComboBox = new JComboBox(), 
+            employees = new JComboBox(),
+            productEditComboBox = new JComboBox(),
+            productSalesComboBox = new JComboBox()
         ;
          
         final private JTextField 
@@ -124,7 +126,8 @@ public class MainGui extends JFrame
             editSalesButton = new JButton("Edit"), 
             deleteSalesButton = new JButton("Delete"),
             editInventoryButton = new JButton("Edit"), 
-            deleteInventoryButton = new JButton("Delete")
+            deleteInventoryButton = new JButton("Delete"),
+            searchSalesButton= new JButton("Search")
         ;
         
         final private JTabbedPane 
@@ -150,7 +153,7 @@ public class MainGui extends JFrame
             searchManufacturers = new JRadioButton("Search Manufacturer", false)
         ;
         
-        private String selection = "products";
+        private String selection = "products", qry;
         JLabel inventoryLabel = new JLabel("Products:");
         
         Connection conn = null;
@@ -189,6 +192,7 @@ public class MainGui extends JFrame
             buildCreateProductPanel();
             buildCreateManufacturerPanel();
             buildCreateSalesPanel();
+            buildSearchSalesPanel();
             buildFooterPanel();
             
             if (isAdmin)
@@ -402,7 +406,7 @@ public class MainGui extends JFrame
                 // use a loop to store each item
                 for (String string : itemNames) 
                 {
-                    manufacturers.addItem(string);
+                    manufacturersEditComboBox.addItem(string);
                 }
             }
             catch(SQLException e1)
@@ -422,7 +426,7 @@ public class MainGui extends JFrame
             productNorthPanel.add(new JLabel("Price:"));
             productNorthPanel.add(textProductPrice);
             productNorthPanel.add(new JLabel("Manufacturer:"));
-            productNorthPanel.add(manufacturers);
+            productNorthPanel.add(manufacturersEditComboBox);
             
             // Setup product panel.
             createProductPanel.setLayout(new BorderLayout());
@@ -527,18 +531,12 @@ public class MainGui extends JFrame
         {
             JPanel salesNorthPanel = new JPanel();
             salesNorthPanel.setLayout(new GridLayout(3,2));
-
-            // Database Connection Here
-            JComboBox products = new JComboBox();
-            //products.setSelectedIndex(0);
-            JComboBox employees = new JComboBox();
-            //employees.setSelectedIndex(0);
             
             g.border(salesNorthPanel, "Sales Information");
             salesNorthPanel.add(new JLabel("Quantity:"));
             salesNorthPanel.add(textSalesQuantity);
             salesNorthPanel.add(new JLabel("Product:"));
-            salesNorthPanel.add(products);
+            salesNorthPanel.add(productSalesComboBox);
             salesNorthPanel.add(new JLabel("Employee:"));
             salesNorthPanel.add(employees);
             
@@ -570,7 +568,7 @@ public class MainGui extends JFrame
             
             g.border(editSalesNorthPanel, "Sales Information");
             editSalesNorthPanel.add(new JLabel("Sale:"));
-            editSalesNorthPanel.add(products);
+            editSalesNorthPanel.add(productSalesComboBox);
             
             JPanel editSalesSouthPanel = new JPanel();
             editSalesSouthPanel.setLayout(new FlowLayout());
@@ -640,7 +638,7 @@ public class MainGui extends JFrame
             g.border(editInvCenterPanel, "Inventory Information");
             editInvCenterPanel.setLayout(new FlowLayout());
             editInvCenterPanel.add(inventoryLabel);
-            editInvCenterPanel.add(products);
+            editInvCenterPanel.add(productEditComboBox);
             
             JPanel editInvSouthPanel = new JPanel();
             editInvSouthPanel.setLayout(new FlowLayout());
@@ -660,7 +658,32 @@ public class MainGui extends JFrame
             editInventoryPanel.add(editInvSouthPanel, BorderLayout.SOUTH);
         }//End of buildEditInventoryPanel
         
+        
+        /**
+         * This method builds the human resources search panel.
+         */
+        private void buildSearchSalesPanel()
+        {
+            JPanel searchSalesNorthPanel = new JPanel();
+            searchSalesNorthPanel.setLayout(new FlowLayout());
+            g.border(searchSalesNorthPanel, "Search Employees:");
+            
+            searchSalesButton.addActionListener(new SearchSalesButtonListener());
+            
+            JPanel searchSalesSouthPanel = new JPanel();
+            searchSalesSouthPanel.add(searchSalesButton);
+            
+            searchSalesNorthPanel.add(new JLabel("Search Sales:"));
+            searchSalesNorthPanel.add(textSearchEmployees);          
+            areaSearchResults.setEditable(false);
+            searchSalesPanel.setLayout(new BorderLayout());
+            JScrollPane scrollPane = new JScrollPane(employeeSearchTable);
+            searchSalesPanel.add(searchSalesNorthPanel, BorderLayout.NORTH);
+            searchSalesPanel.add(scrollPane, BorderLayout.CENTER);
+            searchSalesPanel.add(searchSalesSouthPanel, BorderLayout.SOUTH);
+        }//End of buildSearchEmployeePanel
 
+        
         /**
          * This creates the panel for our button.
          */
@@ -911,7 +934,7 @@ public class MainGui extends JFrame
                 else if(manufacturerButton.isSelected())
                 {
                     inventoryLabel.setText("Manufacturers");
-                    populateInventoryComboBox("manufacturer");
+                    populateInventoryComboBox("manufacturers");
                 }
             }
         }//end of handler
@@ -930,7 +953,7 @@ public class MainGui extends JFrame
         } // End of SubmitButtonListener inner class.
         
         
-        private class SearchProductButtonListener implements ActionListener
+/**fix**/private class SearchProductButtonListener implements ActionListener
         {
             @Override public void actionPerformed(ActionEvent e) 
             {
@@ -938,6 +961,23 @@ public class MainGui extends JFrame
                 {
                     insertProduct();
                 } catch(SQLException e1)
+                {
+                    g.sqlError(e1, "Error");
+                }
+              
+            }
+        } // end of SearchProductButtonListener Listener
+        
+        
+/**fix**/private class SearchSalesButtonListener implements ActionListener
+        {
+            @Override public void actionPerformed(ActionEvent e) 
+            {
+                try 
+                {
+                    insertProduct(); // Update to search method.
+                } 
+                catch(SQLException e1)
                 {
                     g.sqlError(e1, "Error");
                 }
@@ -1233,17 +1273,17 @@ public class MainGui extends JFrame
                 
                 while (rs.next())
                 {
-                    products.addItem(rs.getString("name"));
+                    productEditComboBox.addItem(rs.getString("name"));
                 }
             } 
-            else if (selection == "manufacturer")
+            else if (selection == "manufacturers")
             {
                 String qry = "SELECT * FROM manufacturer";
                 rs = stat.executeQuery(qry);
                 
                 while (rs.next())
                 {
-                    manufacturers.addItem(rs.getString("name"));
+                    manufacturersEditComboBox.addItem(rs.getString("name"));
                 }
             }
         }
@@ -1271,7 +1311,7 @@ public class MainGui extends JFrame
             
             while (rs.next())
             {
-                products.addItem(rs.getString("product"));
+                productSalesComboBox.addItem(rs.getString("product"));
             }
         }
         catch (SQLException e) 
@@ -1374,14 +1414,14 @@ public class MainGui extends JFrame
             
             stat = conn.createStatement();
             
-            String SQL = "INSERT INTO manufacturer"
-                + " (`name`, `loaction`, `phonenumber`)"
+            qry = "INSERT INTO manufacturer"
+                + " (`name`, `location`, `phonenumber`)"
                 + "VALUES ('" + textManufacturerName.getText() + "', '"
                 + textManufacturerLocation.getText() + "', '" 
                 + textManufacturerPhoneNumber.getText() + "');";
                 
             //System.out.println(SQL);
-            stat.executeUpdate(SQL);
+            stat.executeUpdate(qry);
         }
         catch(SQLException e)
         {
@@ -1479,20 +1519,21 @@ public class MainGui extends JFrame
         try 
         {
             conn = DriverManager.getConnection
-                    (
-                        g.getDb(), 
-                        g.getDbUser(),
-                        g.getDbPass()
-                    );
+            (
+                g.getDb(), 
+                g.getDbUser(),
+                g.getDbPass()
+            );
             
             stat = conn.createStatement();
             
-            String SQL = "INSERT INTO sales"
+            qry = "INSERT INTO sales"
                 + " (`quantity`, `product`, `employee`)"
                 + "VALUES ('"+textSalesQuantity.getText()+"', '"
-                + textManufacturerLocation.getText()+"', '"+ textManufacturerPhoneNumber.getText()+"');";
+                + textManufacturerLocation.getText()+"', '"
+                + textManufacturerPhoneNumber.getText()+"');";
             
-            stat.executeUpdate(SQL);
+            stat.executeUpdate(qry);
         
         } 
         catch(SQLException e)
@@ -1503,7 +1544,7 @@ public class MainGui extends JFrame
         {
             g.generalError(e2, "Error");
         }
-            catch(Exception e1)
+        catch(Exception e1)
         {
             g.generalError(e1, "Error");
         }
