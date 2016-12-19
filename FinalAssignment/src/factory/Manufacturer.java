@@ -4,6 +4,9 @@
 */
 package factory;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * @author Created by: Matthew Walichnowsky | 200171919
  */
@@ -25,6 +28,7 @@ public class Manufacturer
         {
             setManufacturerName(manufacturerName);
             setManufacturerLocation(manufacturerLocation);
+            setManufacturerPhoneNumber(manufacturerPhoneNumber);
         }
     /////////////////////// End of constructor /////////////////////////////////
         
@@ -68,6 +72,25 @@ public class Manufacturer
             this.manufacturerLocation = manufacturerLocation;
         } // End of setManufactorLocationmethod.
         
+        
+        /**
+        * This method returns the manufacturer manufacturerLocation as a String.
+        * @return manufacturerPhoneNumber
+        */
+        public String getManufacturerPhoneNumber()
+        {
+            return this.manufacturerPhoneNumber;
+        } // End of getManufacturerLocation method.
+
+        
+        /**
+         * This method sets the manufacturer manufacturerLocation as a String.
+         * @param manufacturerPhoneNumber
+         */
+        private void setManufacturerPhoneNumber(String manufacturerPhoneNumber)
+        {
+            this.manufacturerPhoneNumber = manufacturerPhoneNumber;
+        } // End of setManufactorLocationmethod.
         
     /////////////////////// End of get and set methods. ////////////////////////
 
