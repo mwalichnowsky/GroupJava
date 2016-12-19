@@ -10,14 +10,17 @@ package factory;
 public class Manufacturer 
 {
     /* ----------------------- Variables------------------------------------- */
-        private String manufacturerName, manufacturerLocation;
+        private String 
+            manufacturerName, manufacturerLocation, manufacturerPhoneNumber
+        ;
     /////////////////////// End of Variables ///////////////////////////////////
 
     /* ----------------------- Constructor ---------------------------------- */
         public Manufacturer
         (
             String manufacturerName, 
-            String manufacturerLocation
+            String manufacturerLocation,
+            String manufacturerPhoneNumber
         )
         {
             setManufacturerName(manufacturerName);

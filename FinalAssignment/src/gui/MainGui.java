@@ -621,21 +621,20 @@ public class MainGui extends JFrame
         private void buildEditInventoryPanel()
         {
             JPanel editInvNorthPanel = new JPanel();
-            editInvNorthPanel.setLayout(new FlowLayout());
+            editInvNorthPanel.setLayout(new GridLayout(1,1));
             ButtonGroup editButtonGroup = new ButtonGroup();
             editButtonGroup.add(productButton);
             editButtonGroup.add(manufacturerButton);
             editInvNorthPanel.add(productButton);
             editInvNorthPanel.add(manufacturerButton);
             
+            populateInventoryComboBox("products");
             
             JPanel editInvCenterPanel = new JPanel();
             editInvCenterPanel.setLayout(new BorderLayout());
 
-            // Database Connection Here
-            JComboBox products = new JComboBox();
-            
             g.border(editInvCenterPanel, "Inventory Information");
+            editInvCenterPanel.setLayout(new FlowLayout());
             editInvCenterPanel.add(inventoryLabel);
             editInvCenterPanel.add(products);
             
@@ -903,11 +902,13 @@ public class MainGui extends JFrame
                 if(productButton.isSelected())
                 {
                     inventoryLabel.setText("Products");
+                    populateInventoryComboBox("products");
                 }
                 // getting the manufactuer table
                 else if(manufacturerButton.isSelected())
                 {
                     inventoryLabel.setText("Manufacturers");
+                    populateInventoryComboBox("manufacturer");
                 }
             }
         }//end of handler
@@ -1205,11 +1206,8 @@ public class MainGui extends JFrame
     
     public void populateInventoryComboBox(String selection)
     {
-        String selection;
         try
         {
-            final String qry = "SELECT * FROM '"+selection+"' ";
-            
             conn = DriverManager.getConnection
             (
                 g.getDb(), g.getDbUser(), g.getDbPass()
@@ -1217,23 +1215,26 @@ public class MainGui extends JFrame
             
             stat = conn.createStatement();
             
-            rs = stat.executeQuery(qry);
-            
             if (selection == "products")
             {
+                String qry = "SELECT * FROM products";
+                rs = stat.executeQuery(qry);
+                
                 while (rs.next())
                 {
                     products.addItem(rs.getString("name"));
                 }
-            }
-            else if (selection == "manufacturers")
+            } 
+            else if (selection == "manufacturer")
             {
+                String qry = "SELECT * FROM manufacturer";
+                rs = stat.executeQuery(qry);
+                
                 while (rs.next())
                 {
                     manufacturers.addItem(rs.getString("name"));
                 }
             }
-            
         }
         catch (SQLException e) 
         {
