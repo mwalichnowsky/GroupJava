@@ -29,9 +29,10 @@ public class MainGui extends JFrame
     
         private JComboBox 
             manufacturersEditComboBox = new JComboBox(), 
-            employees = new JComboBox(),
+            employeeComboBox = new JComboBox(),
             productEditComboBox = new JComboBox(),
-            productSalesComboBox = new JComboBox()
+            productSalesComboBox = new JComboBox(),
+            employeeCreateSalesComboBox = new JComboBox()
         ;
          
         final private JTextField 
@@ -121,6 +122,8 @@ public class MainGui extends JFrame
             submitButton = new JButton("Submit"), 
             createButton = new JButton("Create"),
             clearButton = new JButton("Clear"), 
+            createSaleButton = new JButton("Create"),
+            clearSaleButton = new JButton("Clear"), 
             editEmployeeButton = new JButton("Edit"), 
             deleteEmployeeButton = new JButton("Delete"),
             editSalesButton = new JButton("Edit"), 
@@ -538,16 +541,16 @@ public class MainGui extends JFrame
             salesNorthPanel.add(new JLabel("Product:"));
             salesNorthPanel.add(productSalesComboBox);
             salesNorthPanel.add(new JLabel("Employee:"));
-            salesNorthPanel.add(employees);
+            salesNorthPanel.add(employeeCreateSalesComboBox);
             
             JPanel salesSouthPanel = new JPanel();
             salesSouthPanel.setLayout(new FlowLayout());
-            salesSouthPanel.add(createButton);
-            salesSouthPanel.add(clearButton);
+            salesSouthPanel.add(createSaleButton);
+            salesSouthPanel.add(clearSaleButton);
             
             // Action Listeners.
-            createButton.addActionListener(new CreateButtonListener());
-            clearButton.addActionListener(new ClearSalesButtonListener());
+            createSaleButton.addActionListener(new CreateSalesButtonListener());
+            clearSaleButton.addActionListener(new ClearSalesButtonListener());
             
             createSalesPanel.setLayout(new BorderLayout());
             createSalesPanel.add(salesNorthPanel, BorderLayout.NORTH);
@@ -598,7 +601,7 @@ public class MainGui extends JFrame
             
             g.border(editEmpNorthPanel, "Employee Information");
             editEmpNorthPanel.add(new JLabel("Employee:"));
-            editEmpNorthPanel.add(employees);
+            editEmpNorthPanel.add(employeeComboBox);
             
             JPanel editEmpSouthPanel = new JPanel();
             g.border(editEmpSouthPanel, "Options");
@@ -791,7 +794,7 @@ public class MainGui extends JFrame
         /**
          * Private inner class for event handling.
          */
-        private class CreateButtonListener implements ActionListener
+        private class CreateSalesButtonListener implements ActionListener
         {
             @Override 
             public void actionPerformed(ActionEvent event)
@@ -808,7 +811,9 @@ public class MainGui extends JFrame
                     {
                         //add to database
                         insertSales();
-                    } catch (Exception e) {
+                    } 
+                    catch (Exception e) 
+                    {
                         System.out.print(e);
                     } 
                 }
@@ -1245,7 +1250,7 @@ public class MainGui extends JFrame
             
             while (rs.next())
             {
-                employees.addItem(rs.getString("firstName"));
+                employeeComboBox.addItem(rs.getString("firstName"));
             }
         }
         catch (SQLException e) 
@@ -1530,8 +1535,8 @@ public class MainGui extends JFrame
             qry = "INSERT INTO sales"
                 + " (`quantity`, `product`, `employee`)"
                 + "VALUES ('"+textSalesQuantity.getText()+"', '"
-                + textManufacturerLocation.getText()+"', '"
-                + textManufacturerPhoneNumber.getText()+"');";
+                + productSalesComboBox.getSelectedItem().toString()+"', '"
+                + employeeComboBox.getSelectedItem().toString()+"');";
             
             stat.executeUpdate(qry);
         
